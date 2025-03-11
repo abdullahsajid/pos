@@ -12,7 +12,7 @@
             </VerticalStackLayout>
         </Grid>
         <Grid Grid.Column="1" RowDefinitions="Auto, Auto, *" RowSpacing="10">
-            <CollectionView Grid.Row="1" ItemsSource="{Binding Categories}" HorizontalOptions="Center" HorizontalScrollBarVisibility="Default">
+            <CollectionView Grid.Row="1" x:Name="CategoryListView" ItemsSource="{Binding Categories}" HorizontalOptions="Center" HorizontalScrollBarVisibility="Default">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout ItemSpacing="10" Orientation="Horizontal"/>
                 </CollectionView.ItemsLayout>
@@ -29,7 +29,39 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-            <Label Grid.Row="2" Text="Cards"/>
+            <Grid Grid.Row="2" RowDefinitions="Auto, Auto, Auto">
+                <Entry x:Name="NameEntry" Placeholder="Product Name" Grid.Row="0" TextColor="Black" HorizontalOptions="Fill" VerticalOptions="Center"/>
+                <Entry x:Name="PriceEntry" Placeholder="Product Price" Grid.Row="1" TextColor="Black" HorizontalOptions="Fill" VerticalOptions="Center"/>
+                <Button Text="Add Product" Clicked="OnAddProductClicked" Grid.Row="2" HorizontalOptions="Center" 
+            VerticalOptions="Center"/>
+                
+                <CollectionView x:Name="ProductListView" ItemsSource="{Binding Products}" VerticalOptions="Center">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="20,10"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10"
+                                BackgroundColor="#753F21">
+                                <VerticalStackLayout>
+                                    <Label Text="{Binding Name}" TextColor="white"/>
+                                    <Label Text="{Binding Price}" TextColor="white"/>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                <ActivityIndicator 
+                    IsRunning="{Binding IsBusy}"  
+                    HeightRequest="25"
+                    WidthRequest="25"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    Color="Black"
+                />
+            </Grid>
         </Grid>
     </Grid>
 </ContentPage>
