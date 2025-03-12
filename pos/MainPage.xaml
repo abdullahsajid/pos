@@ -30,24 +30,19 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
             <Grid Grid.Row="2" RowDefinitions="Auto, Auto, Auto">
-                <Entry x:Name="NameEntry" Placeholder="Product Name" Grid.Row="0" TextColor="Black" HorizontalOptions="Fill" VerticalOptions="Center"/>
-                <Entry x:Name="PriceEntry" Placeholder="Product Price" Grid.Row="1" TextColor="Black" HorizontalOptions="Fill" VerticalOptions="Center"/>
-                <Button Text="Add Product" Clicked="OnAddProductClicked" Grid.Row="2" HorizontalOptions="Center" 
-            VerticalOptions="Center"/>
-                
                 <CollectionView x:Name="ProductListView" ItemsSource="{Binding Products}" VerticalOptions="Center">
                     <CollectionView.ItemsLayout>
-                        <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
+                        <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Border Padding="20,10"
-                                StrokeThickness="0"
-                                StrokeShape="RoundRectangle 10"
-                                BackgroundColor="#753F21">
-                                <VerticalStackLayout>
-                                    <Label Text="{Binding Name}" TextColor="white"/>
-                                    <Label Text="{Binding Price}" TextColor="white"/>
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 10"
+                                    >
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="{Binding Name}" TextColor="black" FontSize="18"/>
+                                    <Label Text="{Binding Price, StringFormat='{0:C}'}" FontSize="24" TextColor="black"/>
                                 </VerticalStackLayout>
                             </Border>
                         </DataTemplate>
@@ -61,6 +56,7 @@
                     VerticalOptions="Center"
                     Color="Black"
                 />
+                
             </Grid>
         </Grid>
     </Grid>

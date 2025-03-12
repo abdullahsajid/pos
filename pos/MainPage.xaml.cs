@@ -81,38 +81,38 @@ namespace pos
             _isBusy = false;
         }
 
-        private async void OnAddProductClicked(object sender, EventArgs e)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(NameEntry.Text) || string.IsNullOrEmpty(PriceEntry.Text))
-                {
-                    await DisplayAlert("Error", "Please enter product name and price", "OK");
-                    return;
-                }
-                var newProduct = new ProductModel
-                {
-                    Name = NameEntry.Text,
-                    Price = PriceEntry.Text
-                };
+        //private async void OnAddProductClicked(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (string.IsNullOrEmpty(NameEntry.Text) || string.IsNullOrEmpty(PriceEntry.Text))
+        //        {
+        //            await DisplayAlert("Error", "Please enter product name and price", "OK");
+        //            return;
+        //        }
+        //        var newProduct = new ProductModel
+        //        {
+        //            Name = NameEntry.Text,
+        //            Price = PriceEntry.Text
+        //        };
 
-                int rowsAffected = await _dbServices.AddProduct(newProduct);
-                if (rowsAffected > 0)
-                {
-                    await GetProduct();
-                    NameEntry.Text = string.Empty;
-                    PriceEntry.Text = string.Empty;
-                }
-                else
-                {
-                    await DisplayAlert("Error", "Failed to add product.", "OK");
-                }
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
-            }
-        }
+        //        int rowsAffected = await _dbServices.AddProduct(newProduct);
+        //        if (rowsAffected > 0)
+        //        {
+        //            await GetProduct();
+        //            NameEntry.Text = string.Empty;
+        //            PriceEntry.Text = string.Empty;
+        //        }
+        //        else
+        //        {
+        //            await DisplayAlert("Error", "Failed to add product.", "OK");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
+        //    }
+        //}
 
         //private async void AddCategory_Clicked(object sender, EventArgs e)
         //{
