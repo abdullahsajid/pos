@@ -8,7 +8,44 @@
     <Grid ColumnDefinitions=".40*, .60*">
         <Grid Grid.Column="0">
             <VerticalStackLayout Grid.Row="0">
-                <Label Text="POS"/>
+                <Label Text="POS" TextColor="Black"/>
+                <Grid Padding="20" RowSpacing="0" ColumnSpacing="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" BackgroundColor="#F8F8F8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition Width="100" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0" Text="Name" TextColor="Black" FontAttributes="Bold" Padding="10" />
+                        <Label Grid.Column="2" Text="Qty" TextColor="Black" FontAttributes="Bold" Padding="10" />
+                        <Label Grid.Column="3" Text="Price" TextColor="Black" FontAttributes="Bold" Padding="10" />
+                        <Label Grid.Column="1" Text="Amount" TextColor="Black" FontAttributes="Bold" Padding="10" />
+                    </Grid>
+
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition Width="100" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0" Text="Red maxi-dress" TextColor="Black" Padding="10" />
+                        <Label Grid.Column="1" Text="1" Padding="10" TextColor="Black" />
+                        <Label Grid.Column="2" Text="50.00" Padding="10" TextColor="Black" HorizontalTextAlignment="Center" />
+                        <Label Grid.Column="3" Text="50.00" Padding="10" TextColor="Black" HorizontalTextAlignment="End" />
+                    </Grid>
+
+                    <BoxView Grid.Row="0" Grid.ColumnSpan="4" HeightRequest="1" BackgroundColor="#E0E0E0" VerticalOptions="End" />
+                    <BoxView Grid.Row="1" Grid.ColumnSpan="4" HeightRequest="1" BackgroundColor="#E0E0E0" VerticalOptions="End" />
+                </Grid>
             </VerticalStackLayout>
         </Grid>
         <Grid Grid.Column="1" RowDefinitions="Auto, Auto, *" RowSpacing="10">
@@ -41,6 +78,7 @@
                                     StrokeShape="RoundRectangle 10"
                                     >
                                 <VerticalStackLayout Spacing="5">
+                                    <Label Text="{Binding Id}" TextColor="Black"/>
                                     <Label Text="{Binding Name}" TextColor="black" FontSize="18"/>
                                     <Label Text="{Binding Price, StringFormat='{0:C}'}" FontSize="24" TextColor="black"/>
                                 </VerticalStackLayout>
