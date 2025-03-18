@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using pos.Data;
+using pos.ViewModels;
 
 namespace pos;
 
@@ -22,6 +23,9 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 		builder.Services.AddSingleton<DB_Services>();
-		return builder.Build();
+        builder.Services.AddSingleton<HomeViewModel>();
+        builder.Services.AddSingleton<MainPage>();
+
+        return builder.Build();
 	}
 }

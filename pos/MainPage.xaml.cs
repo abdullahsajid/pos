@@ -1,49 +1,25 @@
-﻿using pos.Data;
-using pos.Models;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows.Input;
+﻿using pos.ViewModels;
 
 namespace pos
 {
-    public partial class MainPage : ContentPage, INotifyPropertyChanged
+    public partial class MainPage : ContentPage
     {
-        private ObservableCollection<CategoryModel> _categories;
-        private readonly DB_Services _dbServices;
         public bool _isBusy;
-        public ObservableCollection<CategoryModel> Categories
-        {
-            get => _categories;
-            set
-            {
-                _categories = value;
-                OnPropertyChanged(nameof(Categories));
-            }
-        }
+        //}
+        //public event PropertyChangedEventHandler PropertyChanged;
+        //protected void OnPropertyChanged(string propertyName) =>
+        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         //public ICommand SelectCategoryCommand { get; }
         //public event PropertyChangedEventHandler PropertyChanged;
         //protected void OnPropertyChanged(string propertyName) =>
         //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-
-
-        public MainPage()
+        public MainPage(HomeViewModel homeViewModel)
         {
             InitializeComponent();
-            _dbServices = new DB_Services();
-            Task.Run(async () => await GetCategory());
-            Task.Run(async () => await GetProduct());
-            //    BindingContext = this;
+            BindingContext = homeViewModel;
 
-            //    Categories = new ObservableCollection<CategoryModel>
-            //{
-            //    new CategoryModel { Id = 1, Name = "Bread" },
-            //    new CategoryModel { Id = 2, Name = "Pastries" },
-            //    new CategoryModel { Id = 3, Name = "Cakes" },
-            //    new CategoryModel { Id = 4, Name = "Beverages" },
-            //    new CategoryModel { Id = 5, Name = "Snacks" },
-            //    new CategoryModel { Id = 6, Name = "Desserts" }
-            //};
+            Loaded += MainPage_Loaded;
 
             //SelectCategoryCommand = new Command<int>(async (categoryId) =>
             //{
@@ -54,32 +30,68 @@ namespace pos
             //    }
             //});
         }
-
-        private async Task GetCategory()
+        private async void MainPage_Loaded(object sender, EventArgs e)
         {
-            _isBusy = true;
-            await _dbServices.initDatabase();
-            await Task.Delay(3000);
-            var categories = await _dbServices.GetCategory();
-            await MainThread.InvokeOnMainThreadAsync(() =>
-            {
-                CategoryListView.ItemsSource = categories;
-            });
-            _isBusy = false;
+            await (BindingContext as HomeViewModel).InitializeAsync();
         }
+ 
+        //private async Task GetCategory()
+        //{
+        //    _isBusy = true;
+        //    await _dbServices.initDatabase();
+        //    await Task.Delay(3000);
+        //    var categories = await _dbServices.GetCategory();
+        //    System.Diagnostics.Debug.WriteLine($"Categories: {categories}");
+        //    await MainThread.InvokeOnMainThreadAsync(() =>
+        //    {
+        //        CategoryListView.ItemsSource = categories;
+        //    });
+        //    _isBusy = false;
+        //}
 
-        private async Task GetProduct()
-        {
-            _isBusy = true;
-            await _dbServices.initDatabase();
-            await Task.Delay(3000);
-            var products = await _dbServices.GetProducts();
-            await MainThread.InvokeOnMainThreadAsync(() =>
-            {
-                ProductListView.ItemsSource = products;
-            });
-            _isBusy = false;
-        }
+        //private async Task GetProduct()
+        //{
+        //    _isBusy = true;
+        //    await _dbServices.initDatabase();
+        //    await Task.Delay(3000);
+        //    var products = await _dbServices.GetProducts();
+        //    Console.WriteLine($"Products: {products}");
+        //    await MainThread.InvokeOnMainThreadAsync(() =>
+        //    {
+        //        ProductListView.ItemsSource = products;
+        //    });
+        //    _isBusy = false;
+        //}
+        //private void IncreaseQuantity(ProductModel product)
+        //{
+        //    if (product != null)
+        //    {
+        //        var cartItem = new Data.CartItem
+        //        {
+        //            Id = product.Id,
+        //            Name = product.Name,
+        //            Price = product.Price,
+        //            Quantity = 1
+        //        };
+        //        _cartService.AddToCart(cartItem); // Add to cart
+        //        product.Quantity = _cartService.GetQuantity(product.Id); // Update UI
+        //    }
+        //}
+
+        //private void DecreaseQuantity(ProductModel product)
+        //{
+        //    if (product != null && _cartService.GetQuantity(product.Id) > 0)
+        //    {
+        //        _cartService.DecrementQuantity(product.Id);
+        //        product.Quantity = _cartService.GetQuantity(product.Id); // Update UI
+        //    }
+        //}
+
+        //protected override async void OnDisappearing()
+        //{
+        //    await _dbServices.DisposeAsync();
+        //    base.OnDisappearing();
+        //}
 
         //private async void OnAddProductClicked(object sender, EventArgs e)
         //{
