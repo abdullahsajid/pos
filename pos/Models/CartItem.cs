@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using SQLite;
 
 namespace pos.Models
 {
@@ -14,7 +10,9 @@ namespace pos.Models
 
         public string Price { get; set; }
 
-        [ObservableProperty]
-        public int quantity;
+        [ObservableProperty,NotifyPropertyChangedFor(nameof(Total))]
+        public int _quantity;
+
+        public decimal Total => _quantity * decimal.Parse(Price);
     }
 }

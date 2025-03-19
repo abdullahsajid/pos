@@ -9,40 +9,98 @@
              xmlns:vm="clr-namespace:pos.ViewModels"
              x:DataType="vm:HomeViewModel">
     <Grid ColumnDefinitions=".40*, .60*">
-        <Grid Grid.Column="0" Margin="20" RowDefinitions="Auto, Auto, *">
-            <Grid Grid.Row="0" Padding="20" BackgroundColor="#F8F8F8">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150" />
-                    <ColumnDefinition Width="100" />
-                    <ColumnDefinition Width="80" />
-                    <ColumnDefinition Width="100" />
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Text="Name" TextColor="Black" FontAttributes="Bold" Padding="10" />
-                <Label Grid.Column="1" Text="Amount" TextColor="Black" FontAttributes="Bold" Padding="10" />
-                <Label Grid.Column="2" Text="Qty" TextColor="Black" FontAttributes="Bold" Padding="10" />
-                <Label Grid.Column="3" Text="Price" TextColor="Black" FontAttributes="Bold" Padding="10" />
-            </Grid>
-            <BoxView Grid.Row="0" HeightRequest="1" BackgroundColor="#E0E0E0" VerticalOptions="End" />
+        <Grid Grid.Column="0" Margin="20" RowDefinitions="Auto, *, Auto" BackgroundColor="White">
+            <VerticalStackLayout Grid.Row="0" Spacing="5">
+                <Grid Grid.Row="0" Padding="08" BackgroundColor="#753F21">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="80" />
+                        <ColumnDefinition Width="100" />
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Text="Name" TextColor="White" FontAttributes="Bold" Padding="10" />
+                    <Label Grid.Column="1" Text="Qty" TextColor="White" FontAttributes="Bold" Padding="10" />
+                    <Label Grid.Column="2" Text="Price" TextColor="White" FontAttributes="Bold" Padding="10" />
+                    <Label Grid.Column="3" Text="Total" TextColor="White" FontAttributes="Bold" Padding="10" />
+                </Grid>
+                <BoxView Grid.Row="0" HeightRequest="1" BackgroundColor="#E0E0E0" VerticalOptions="End" />
             
-            <CollectionView Grid.Row="1"  ItemsSource="{Binding CartItems}">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:CartModel">
-                        <Grid Padding="20" RowSpacing="0" ColumnSpacing="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="150" />
-                                <ColumnDefinition Width="100" />
-                                <ColumnDefinition Width="80" />
-                                <ColumnDefinition Width="100" />
-                            </Grid.ColumnDefinitions>
-                            <Label Grid.Column="0" Text="{Binding Name}" TextColor="Black" Padding="10" />
-                            <Label Grid.Column="1" Text="{Binding Quantity}" Padding="10" TextColor="Black" />
-                            <Label Grid.Column="2" Text="{Binding Price, StringFormat='{0:C}'}" Padding="10" TextColor="Black" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="{Binding Price, StringFormat='{0:C}'}" Padding="10" TextColor="Black" HorizontalTextAlignment="End" />
-                            <BoxView Grid.ColumnSpan="4" HeightRequest="1" BackgroundColor="#E0E0E0" VerticalOptions="End" />
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                <CollectionView Grid.Row="1"  ItemsSource="{Binding CartItems}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:CartModel">
+                            <Grid Padding="20" RowSpacing="0" ColumnSpacing="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150" />
+                                    <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="80" />
+                                    <ColumnDefinition Width="100" />
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0" Text="{Binding Name}" TextColor="Black" Padding="10" />
+                                <Label Grid.Column="1" Text="{Binding Quantity}" Padding="10" TextColor="Black" />
+                                <Label Grid.Column="2" Text="{Binding Price, StringFormat='{0:C}'}" Padding="10" TextColor="Black" HorizontalTextAlignment="Center" />
+                                <Label Grid.Column="3" Text="{Binding Total, StringFormat='{0:C}'}" Padding="10" TextColor="Black" HorizontalTextAlignment="End" />
+                                <BoxView Grid.ColumnSpan="4" HeightRequest="1" BackgroundColor="#E0E0E0" VerticalOptions="End" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+            <VerticalStackLayout Grid.Row="2">
+                <Border Padding="5, 10" Margin="10" StrokeShape="RoundRectangle 10">
+                    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto"
+                          ColumnDefinitions="2*, 3*"
+                          >
+                        <Label 
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Text="Payment" 
+                            FontSize="22"
+                            TextColor="Black" 
+                        />
+                        <Entry
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            FontSize="22"
+                            Text="{Binding Payment, Mode=TwoWay}"
+                            Keyboard="Numeric"
+                            HorizontalTextAlignment="Center"
+                            TextColor="Black"
+                        />
+                        <Label 
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Text="Change" 
+                            FontSize="22"
+                            TextColor="Black" 
+                        />
+                        <Label 
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            FontSize="22"
+                            Text="{Binding Change}" 
+                            TextColor="Black" 
+                            HorizontalTextAlignment="Center"
+                        />
+                        <Label 
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Text="Total" 
+                            FontSize="23"
+                            TextColor="Black"
+                            FontAttributes="Bold"
+                        />
+                        <Label 
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            FontSize="23"
+                            Text="{Binding Total, StringFormat='{0:C}'}" 
+                            TextColor="Black" 
+                            HorizontalTextAlignment="Center"
+                            FontAttributes="Bold"
+                        />
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
         </Grid>
         <Grid Grid.Column="1" RowDefinitions="Auto, Auto, *" RowSpacing="10">
             <CollectionView Grid.Row="1" x:Name="CategoryListView" ItemsSource="{Binding Categories}" HorizontalOptions="Center" HorizontalScrollBarVisibility="Default">
@@ -74,7 +132,6 @@
                                     StrokeShape="RoundRectangle 10"
                                     >
                                 <VerticalStackLayout Spacing="5">
-                                    <Label Text="{Binding Id}" TextColor="Black"/>
                                     <Label Text="{Binding Name}" TextColor="black" FontSize="18"/>
                                     <Label Text="{Binding Price, StringFormat='{0:C}'}" FontSize="24" TextColor="black"/>
                                     <Button Text="Add to cart" 
@@ -84,6 +141,11 @@
                                         Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.AddToCartCommand}"
                                         CommandParameter="{Binding .}"/>
                                 </VerticalStackLayout>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer 
+                                        Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.AddToCartCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                </Border.GestureRecognizers>
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

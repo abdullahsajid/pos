@@ -21,10 +21,33 @@ namespace pos.ViewModels
         private MenuItem[] _menuItems = [];
         public ObservableCollection<CartModel> CartItems { get; set; } = new();
 
+        [ObservableProperty]
+        private decimal _total;
+
         public HomeViewModel(DB_Services dbServices)
         {
             _dbServices = dbServices;
             //Task.Run(async () => await GetCategory());
+        }
+        [ObservableProperty]
+        private string payment;
+
+        public string Change
+        {
+            get
+            {
+                if (decimal.TryParse(Payment, out decimal paymentAmount))
+                {
+                    decimal changeAmount = paymentAmount - Total;
+                    return changeAmount >= 0 ? changeAmount.ToString() : "0";
+                }
+                return "0";
+            }
+        }
+
+        partial void OnPaymentChanged(string value)
+        {
+            OnPropertyChanged(nameof(Change));
         }
 
         public async Task InitializeAsync()
@@ -64,14 +87,21 @@ namespace pos.ViewModels
                     itemId = menuItem.Id,
                     Name = menuItem.Name,
                     Price = menuItem.Price,
-                    quantity = 1
+                    Quantity = 1
                 };
                 CartItems.Add(cartitem);
+                UpdateTotal();
             }
             else
             {
-                cartitem.quantity++;
+                cartitem.Quantity++;
+                UpdateTotal();
             }
+        }
+
+        public void UpdateTotal()
+        {
+            Total = CartItems.Sum(c => c.Total);
         }
 
     }

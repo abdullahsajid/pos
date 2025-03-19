@@ -1,4 +1,5 @@
 ﻿using pos.Data;
+using System.Globalization;
 
 namespace pos
 {
@@ -9,6 +10,9 @@ namespace pos
         {
             InitializeComponent();
             _dbServices = dbservice;
+            var culture = new CultureInfo("en-PK");
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
         }
 
         protected override async void OnStart()
