@@ -34,11 +34,30 @@
                                     <ColumnDefinition Width="100" />
                                     <ColumnDefinition Width="80" />
                                     <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="100" />
                                 </Grid.ColumnDefinitions>
                                 <Label Grid.Column="0" Text="{Binding Name}" TextColor="Black" Padding="10" />
-                                <Label Grid.Column="1" Text="{Binding Quantity}" Padding="10" TextColor="Black" />
+                                <Entry 
+                                    Grid.Column="1"
+                                    Text="{Binding Quantity, Mode=TwoWay}"
+                                    TextColor="Black"
+                                    Keyboard="Numeric"
+                                    HorizontalTextAlignment="Center"
+                                    WidthRequest="60"
+                                />
                                 <Label Grid.Column="2" Text="{Binding Price, StringFormat='{0:C}'}" Padding="10" TextColor="Black" HorizontalTextAlignment="Center" />
                                 <Label Grid.Column="3" Text="{Binding Total, StringFormat='{0:C}'}" Padding="10" TextColor="Black" HorizontalTextAlignment="End" />
+                                <ImageButton
+                                    Source="cross.png"
+                                    Grid.Column="4"
+                                    Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.RemoveFromCartCommand}"
+                                    CommandParameter="{Binding .}"
+                                    ToolTipProperties.Text="Remove item from cart"
+                                    HorizontalOptions="End"
+                                    VerticalOptions="Start"
+                                    HeightRequest="10"
+                                    WidthRequest="10"
+                                />
                                 <BoxView Grid.ColumnSpan="4" HeightRequest="1" BackgroundColor="#E0E0E0" VerticalOptions="End" />
                             </Grid>
                         </DataTemplate>

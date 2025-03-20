@@ -11,8 +11,13 @@ namespace pos.Models
         public string Price { get; set; }
 
         [ObservableProperty,NotifyPropertyChangedFor(nameof(Total))]
-        public int _quantity;
+        public int _quantity = 1;
 
         public decimal Total => _quantity * decimal.Parse(Price);
+
+        partial void OnQuantityChanged(int value)
+        {
+            OnPropertyChanged(nameof(Total));
+        }
     }
 }

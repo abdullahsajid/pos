@@ -4,6 +4,7 @@ using pos.Models;
 using pos.Data;
 using System.Collections.ObjectModel;
 using MenuItem = pos.Models.ProductModel;
+using System.ComponentModel;
 
 namespace pos.ViewModels
 {
@@ -27,8 +28,36 @@ namespace pos.ViewModels
         public HomeViewModel(DB_Services dbServices)
         {
             _dbServices = dbServices;
+            CartItems = new ObservableCollection<CartModel>();
+            CartItems.CollectionChanged += (s, e) =>
+            {
+                if (e.NewItems != null)
+                {
+                    foreach (CartModel item in e.NewItems)
+                    {
+                        item.PropertyChanged += CartItem_PropertyChanged;
+                    }
+                }
+                if (e.OldItems != null)
+                {
+                    foreach (CartModel item in e.OldItems)
+                    {
+                        item.PropertyChanged -= CartItem_PropertyChanged;
+                    }
+                }
+                UpdateTotal();
+            };
             //Task.Run(async () => await GetCategory());
         }
+
+        private void CartItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(CartModel.Quantity) || e.PropertyName == nameof(CartModel.Total))
+            {
+                UpdateTotal();
+            }
+        }
+
         [ObservableProperty]
         private string payment;
 
@@ -102,6 +131,13 @@ namespace pos.ViewModels
         public void UpdateTotal()
         {
             Total = CartItems.Sum(c => c.Total);
+        }
+
+        [RelayCommand]
+        public void RemoveFromCart(CartModel cartItem)
+        {
+            CartItems.Remove(cartItem);
+            UpdateTotal();
         }
 
     }
