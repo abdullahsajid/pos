@@ -4,12 +4,22 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:pos"
-    Shell.FlyoutBehavior="Disabled"
+    xmlns:pages="clr-namespace:pos.Pages"
+    Shell.FlyoutBehavior="Locked"
+    Shell.FlyoutBackgroundColor="White"
+    Shell.FlyoutWidth="60"
     Title="pos">
 
     <ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
+        Icon="home.png"
         Route="MainPage" />
+
+    <ShellContent
+        Title="Product"
+        ContentTemplate="{DataTemplate pages:AddProductPage}"
+        Icon="home.png"
+        Route="AddProductPage" />
 
 </Shell>
