@@ -19,7 +19,7 @@
     <ShellContent
         Title="Product"
         ContentTemplate="{DataTemplate pages:AddProductPage}"
-        Icon="home.png"
+        Icon="grid.png"
         Route="AddProductPage" />
 
 </Shell>

@@ -169,8 +169,21 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-                
-                
+                <BoxView
+                    HorizontalOptions="Fill"
+                    IsVisible="{Binding IsLoading}"
+                    Opacity="0.3"
+                    VerticalOptions="Fill"
+                    Color="#753F21" />
+
+                <ActivityIndicator
+                    HeightRequest="25"
+                    HorizontalOptions="Center"
+                    IsRunning="{Binding IsLoading}"
+                    VerticalOptions="Center"
+                    WidthRequest="25"
+                    Color="Maroon" />
+
             </Grid>
         </Grid>
     </Grid>

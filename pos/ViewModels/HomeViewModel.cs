@@ -5,6 +5,7 @@ using pos.Data;
 using System.Collections.ObjectModel;
 using MenuItem = pos.Models.ProductModel;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace pos.ViewModels
 {
@@ -15,6 +16,9 @@ namespace pos.ViewModels
 
         [ObservableProperty]
         public ObservableCollection<ProductModel> _products = new();
+
+        [ObservableProperty]
+        private bool _isLoading;
 
         private readonly DB_Services _dbServices;
 
@@ -81,9 +85,12 @@ namespace pos.ViewModels
 
         public async Task InitializeAsync()
         {
+            
             await _dbServices.initDatabase();
             await GetCategory();
+            IsLoading = true;
             await GetProduct();
+            IsLoading = false;
         }
 
         public async Task GetCategory()
