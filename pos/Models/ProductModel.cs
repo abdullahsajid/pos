@@ -1,19 +1,35 @@
-﻿using SQLite;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-
+using System.Collections.ObjectModel;
 namespace pos.Models
 {
-    public class ProductModel
+    public partial class ProductModel : ObservableObject
     {
-        [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Barcode { get; set; }
-        public string Description { get; set; }
-        public string Price { get; set; }
-        public int Stock { get; set; }
-        public int CategoryId { get; set; }
+
+        [ObservableProperty]
+        public string _name;
+
+        [ObservableProperty]
+        public string _barcode;
+
+        [ObservableProperty]
+        public string _description;
+
+        [ObservableProperty]
+        public decimal _price;
+
+        [ObservableProperty]
+        public int _stock;
+
+        //[ObservableProperty]
+        //public int Categories;
+
+        public ObservableCollection<CategoryModel> Categories { get; set; } = [];
+
+        public CategoryModel[] SelectedCategories => Categories.Where(c => c.IsSelected).ToArray();
+
         private int _quantity;
         public int Quantity
         {

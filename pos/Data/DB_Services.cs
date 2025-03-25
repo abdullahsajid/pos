@@ -1,3 +1,4 @@
+using pos.Data;
 using pos.Models;
 using SQLite;
 
@@ -15,28 +16,29 @@ public class DB_Services : IAsyncDisposable
 
     public async Task initDatabase()
     {
-        await _database.CreateTableAsync<ProductModel>();
-        await _database.CreateTableAsync<CategoryModel>();
+        await _database.CreateTableAsync<ProductItem>();
+        await _database.CreateTableAsync<MenuCategory>();
     }
 
-    public async Task<int> AddCategory(CategoryModel category)
+    public async Task<int> AddCategory(MenuCategory category)
     {
         return await _database.InsertAsync(category);
     }
-    public async Task<int> AddProduct(ProductModel product)
+    public async Task<int> AddProduct(ProductItem product)
     {
         return await _database.InsertAsync(product);
     }
 
-    public async Task<List<CategoryModel>> GetCategory()
+    public async Task<List<MenuCategory>> GetCategory()
     {
-        return await _database.Table<CategoryModel>().ToListAsync();
+        return await _database.Table<MenuCategory>().ToListAsync();
     }
 
-    public async Task<List<ProductModel>> GetProducts()
+    public async Task<List<ProductItem>> GetProducts()
     {
-        return await _database.Table<ProductModel>().ToListAsync();
+        return await _database.Table<ProductItem>().ToListAsync();
     }
+
 
     public async ValueTask DisposeAsync()
     {

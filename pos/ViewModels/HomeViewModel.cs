@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using pos.Models;
 using pos.Data;
 using System.Collections.ObjectModel;
-using MenuItem = pos.Models.ProductModel;
+using MenuItem = pos.Data.ProductItem;
 using System.ComponentModel;
 using System.Diagnostics;
 
@@ -98,7 +98,12 @@ namespace pos.ViewModels
             try
             {
                 var categories = await _dbServices.GetCategory();
-                Categories = new ObservableCollection<CategoryModel>(categories);
+                Debug.WriteLine($"Categories: {categories.Count}");
+                //foreach (var category in categories)
+                //{
+                //    Debug.WriteLine($"Category: {category.Name}");
+                //}
+                //Categories = new ObservableCollection<CategoryModel>(categories);
             }
             catch (Exception ex)
             {
@@ -109,7 +114,8 @@ namespace pos.ViewModels
         public async Task GetProduct()
         {
             var products = await _dbServices.GetProducts();
-            Products = new ObservableCollection<ProductModel>(products);
+            Debug.WriteLine($"Products: {products.Count}");
+            //Products = new ObservableCollection<ProductItem>(products);
         }
 
         [RelayCommand]
