@@ -11,14 +11,13 @@ namespace pos.ViewModels
     public partial class AddProductModel : ObservableObject
     {
         private readonly DB_Services _dbServices;
-
         public AddProductModel(DB_Services dbServices)
         {
             _dbServices = dbServices;
         }
 
         [ObservableProperty]
-        public CategoryModel[] _categories = [];
+        public ObservableCollection<CategoryModel> _categories = new();
 
         [ObservableProperty]
         public ProductItem[] _products = [];
@@ -32,10 +31,6 @@ namespace pos.ViewModels
         [ObservableProperty]
         private ProductModel _menuItem = new();
 
-        [ObservableProperty]
-        private string newCategoryName;
-
-        public ObservableCollection<MenuCategory> Categoriess { get; set; } = new();
 
         //[RelayCommand]
         //public void ToggleCategorySelection(MenuCategory category) => category.IsSelected = !category.IsSelected;
@@ -49,34 +44,24 @@ namespace pos.ViewModels
             IsLoading = false;
         }
 
-        public ICommand SaveCategoryCommand { get; }
-
-        public async void SaveCategoryAsync(MenuCategory category)
-        {
-            if (!string.IsNullOrWhiteSpace(NewCategoryName))
-            {
-                var newCategory = new MenuCategory
-                {
-                    Name = category.Name
-                };
-                Debug.WriteLine($"New Category: {newCategory.Name}");
-                int result = await _dbServices.AddCategory(newCategory);
-                Debug.WriteLine($"Result: {result}");
-                if (result > 0) // If inserted successfully
-                {
-                    await GetCategory(); // Refresh list
-                    NewCategoryName = string.Empty; // Clear input field
-                }
-            }
-        }
-
         public async Task GetCategory()
         {
             try
             {
-                var categories = await _dbServices.GetCategory();
-                Debug.WriteLine($"Categories: {categories.Count}");
-                //Categories = new ObservableCollection<MenuCategory>(categories);
+                var categoryList = await _dbServices.GetCategory();
+               Debug.WriteLine($"CategoryList: {categoryList.Count}");
+                if (categoryList != null)
+                {
+                    Categories.Clear();
+                    foreach (var category in categoryList)
+                    {
+                        Categories.Add(new CategoryModel
+                        {
+                            Id = category.Id,
+                            Name = category.Name
+                        });
+                    }
+                }
             }
             catch (Exception ex)
             {

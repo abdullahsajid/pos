@@ -27,7 +27,7 @@
 
     <Grid ColumnDefinitions=".40*, .60*">
         <Grid Grid.Column="0" Margin="20" Padding="10" RowDefinitions="Auto, *, Auto" BackgroundColor="White">
-            <ScrollView BindingContext="">
+            <ScrollView>
                 <VerticalStackLayout Spacing="10">
                     <VerticalStackLayout Spacing="2">
                         <Label Style="{StaticResource lbl}" FontAttributes="Bold" Text="Name" TextColor="Black"/>
@@ -36,6 +36,7 @@
                             PlaceholderColor="Black"
                             TextColor="Black"
                             Style="{StaticResource txt}"
+                            x:Name="nameEntryField"
                         />
                     </VerticalStackLayout>
                     <VerticalStackLayout Spacing="2">
@@ -45,6 +46,7 @@
                             PlaceholderColor="Black"
                             TextColor="Black"
                             Style="{StaticResource txt}"
+                            x:Name="priceEntryField"
                         />
                     </VerticalStackLayout>
                     <VerticalStackLayout Spacing="2">
@@ -55,6 +57,7 @@
                             PlaceholderColor="Black"
                             TextColor="Black"
                             Style="{StaticResource txt}"
+                            x:Name="descriptionEntryField"
                         />
                     </VerticalStackLayout>
                     <VerticalStackLayout>
@@ -71,25 +74,7 @@
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="models:CategoryModel">
                                     <Border BackgroundColor="#FFF3EA" HeightRequest="40" StrokeShape="RoundRectangle 10">
-                                        <Label Text="{Binding Name}" TextColor="Black" VerticalOptions="Center" HorizontalOptions="Center">
-                                            <Label.Triggers>
-                                                <DataTrigger Binding="{Binding IsSelected}" TargetType="Label" Value="True">
-                                                    <Setter Property="TextColor" Value="White"/>
-                                                </DataTrigger>
-                                            </Label.Triggers>
-                                        </Label>
-                                        <Border.Triggers>
-                                            <DataTrigger
-                                                Binding="{Binding IsSelected}"
-                                                TargetType="Border"
-                                                Value="True"
-                                            >
-                                                <Setter Property="BackgroundColor" Value="#753F21"/>
-                                            </DataTrigger>
-                                        </Border.Triggers>
-                                        <Border.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleCategorySelectionCommand}" CommandParameter="{Binding .}"/>
-                                        </Border.GestureRecognizers>
+                                        <Label Text="{Binding Name}" TextColor="Black" VerticalOptions="Center" HorizontalOptions="Center"/>
                                     </Border>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
@@ -117,7 +102,7 @@
                                     PlaceholderColor="Black"
                                     TextColor="Black"
                                     Style="{StaticResource txt}"
-                                    Text="{Binding NewCategoryName,Mode=TwoWay}"
+                                    x:Name="categoryEntryField"
                                 />
                             </VerticalStackLayout>
                         </VerticalStackLayout>
@@ -135,24 +120,24 @@
                             BackgroundColor="Green"    
                             Text="Save"
                             TextColor="White" 
-                            Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.SaveCategoryAsync}"
-                            CommandParameter="{Binding .}"
+                            x:Name="saveButton"
+                            Clicked="saveCategory_Clicked"
                         />
                     </Grid>
                 </VerticalStackLayout>
             </ScrollView>
         </Grid>
         <Grid Grid.Column="1" RowDefinitions="Auto, Auto, *" RowSpacing="10">
-            <CollectionView Grid.Row="1" x:Name="CategoryListView" ItemsSource="{Binding Categories}" HorizontalOptions="Center" HorizontalScrollBarVisibility="Default">
+            <CollectionView Grid.Row="1" ItemsSource="{Binding Categories}" HorizontalOptions="Center" HorizontalScrollBarVisibility="Default">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout ItemSpacing="10" Orientation="Horizontal"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:CategoryModel">
                         <Border Padding="20,10"
-                    StrokeThickness="0"
-                    StrokeShape="RoundRectangle 10"
-                    BackgroundColor="#753F21">
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 10"
+                            BackgroundColor="#753F21">  
                             <HorizontalStackLayout Spacing="5">
                                 <Label Text="{Binding Name}"/>
                             </HorizontalStackLayout>

@@ -12,5 +12,6 @@ namespace pos.Data
         public int Stock { get; set; }
         public string Barcode { get; set; }
 
+        public int CategoryId { get; set; }
     }
 }

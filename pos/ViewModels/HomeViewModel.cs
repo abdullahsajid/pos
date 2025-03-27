@@ -97,13 +97,19 @@ namespace pos.ViewModels
         {
             try
             {
-                var categories = await _dbServices.GetCategory();
-                Debug.WriteLine($"Categories: {categories.Count}");
-                //foreach (var category in categories)
-                //{
-                //    Debug.WriteLine($"Category: {category.Name}");
-                //}
-                //Categories = new ObservableCollection<CategoryModel>(categories);
+                var categoryList = await _dbServices.GetCategory();
+                if (categoryList != null)
+                {
+                    Categories.Clear();
+                    foreach (var category in categoryList)
+                    {
+                        Categories.Add(new CategoryModel
+                        {
+                            Id = category.Id,
+                            Name = category.Name
+                        });
+                    }
+                }
             }
             catch (Exception ex)
             {
