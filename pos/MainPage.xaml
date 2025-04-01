@@ -129,12 +129,38 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:CategoryModel">
                         <Border Padding="20,10"
-                                StrokeThickness="0"
+                                StrokeThickness="2"
                                 StrokeShape="RoundRectangle 10"
-                                BackgroundColor="#753F21">
+                                BackgroundColor="#FFF3EA"
+                                Stroke="White"
+                                >
                             <HorizontalStackLayout Spacing="5">
-                                <Label Text="{Binding Name}"/>
+                                <Label Text="{Binding Name}" TextColor="#753F21">
+                                    <Label.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding IsSelected}"
+                                            TargetType="Label"
+                                            Value="True"
+                                        >
+                                            <Setter Property="TextColor" Value="White"/>
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
                             </HorizontalStackLayout>
+                            <Border.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding IsSelected}" 
+                                    TargetType="Border"
+                                    Value="True"
+                                >
+                                    <Setter Property="BackgroundColor" Value="#753F21"/>
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer 
+                                    Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.SelectCategoryCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            </Border.GestureRecognizers>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
@@ -152,7 +178,7 @@
                                     >
                                 <VerticalStackLayout Spacing="5">
                                     <Label Text="{Binding Name}" TextColor="black" FontSize="18"/>
-                                    <Label Text="{Binding Price, StringFormat='{0:C}'}" FontSize="24" TextColor="black"/>
+                                    <Label Text="{Binding Price}" FontSize="24" TextColor="black"/>
                                     <Button Text="Add to cart" 
                                         BackgroundColor="#753F21" 
                                         TextColor="White" 

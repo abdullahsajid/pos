@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using pos.Data;
 
 namespace pos.Models
@@ -11,10 +12,7 @@ namespace pos.Models
         [ObservableProperty]
         public bool _isSelected;
 
-        public static CategoryModel FromEntity(MenuCategory entity) => new()
-        {
-            Id = entity.Id,
-            Name = entity.Name
-        };
+        [RelayCommand]
+        private void ToggleSelection() => IsSelected = !IsSelected; 
     }
 }

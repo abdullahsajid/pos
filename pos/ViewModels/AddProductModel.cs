@@ -5,6 +5,7 @@ using pos.Models;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows.Input;
+using Products = pos.Data.ProductItem;
 
 namespace pos.ViewModels
 {
@@ -20,7 +21,7 @@ namespace pos.ViewModels
         public ObservableCollection<CategoryModel> _categories = new();
 
         [ObservableProperty]
-        public ProductItem[] _products = [];
+        public ObservableCollection<ProductModel> _products = new();
 
         [ObservableProperty]
         private MenuItem[] _menuItems = [];
@@ -31,16 +32,19 @@ namespace pos.ViewModels
         [ObservableProperty]
         private ProductModel _menuItem = new();
 
+        [ObservableProperty]
+        private CategoryModel _selectedCategory = null;
 
-        //[RelayCommand]
-        //public void ToggleCategorySelection(MenuCategory category) => category.IsSelected = !category.IsSelected;
+        [ObservableProperty]
+        private ProductItem _currentProduct;
         public async Task InitializeAsync()
         {
 
             await _dbServices.initDatabase();
+            CurrentProduct = new ProductItem();
             await GetCategory();
             IsLoading = true;
-            //await GetProduct();
+            await GetProducts();
             IsLoading = false;
         }
 
@@ -48,7 +52,7 @@ namespace pos.ViewModels
         {
             try
             {
-                var categoryList = await _dbServices.GetCategory();
+               var categoryList = await _dbServices.GetCategory();
                Debug.WriteLine($"CategoryList: {categoryList.Count}");
                 if (categoryList != null)
                 {
@@ -61,12 +65,95 @@ namespace pos.ViewModels
                             Name = category.Name
                         });
                     }
+                    Categories[1].IsSelected = true;
+
+                    SelectedCategory = Categories[1];
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
             }
+        }
+
+        public async Task GetProducts()
+        {
+            try
+            {
+                var productList = await _dbServices.GetProductsByCategory(SelectedCategory.Id);
+                
+                if (productList != null)
+                {
+                    Products.Clear();
+                    foreach (var product in productList)
+                    {
+                        Products.Add(new ProductModel
+                        {
+                            Id = product.Id,
+                            Name = product.Name,
+                            Price = product.Price
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        private async void SaveProduct()
+        {
+            var selectedCategory = Categories.FirstOrDefault(c => c.IsSelected);
+            if (string.IsNullOrEmpty(CurrentProduct.Name) 
+                || string.IsNullOrEmpty(CurrentProduct.Price.ToString()) 
+                || string.IsNullOrEmpty(CurrentProduct.Description)
+                || selectedCategory == null
+            )
+            {
+                await Shell.Current.DisplayAlert("Error", "Please fill all fields", "OK");
+                return;
+            }
+            var newProduct = new ProductItem
+            {
+                Name = CurrentProduct.Name,
+                Price = CurrentProduct.Price,
+                Description = CurrentProduct.Description,
+                CategoryId = selectedCategory.Id
+            };
+            var result = await _dbServices.AddProduct(newProduct);
+            if (result > 0)
+            {
+                await Shell.Current.DisplayAlert("Success", "Product saved successfully", "OK");
+                CurrentProduct = new ProductItem();
+
+                await GetProducts();
+                foreach (var category in Categories)
+                {
+                    category.IsSelected = false;
+                }
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectCategoryAsync(CategoryModel category)
+        {
+            if (SelectedCategory.Id == category.Id)
+            {
+                return;
+            }
+
+            var currentCategory = Categories.FirstOrDefault(c => c.IsSelected);
+            currentCategory.IsSelected = false;
+
+            var newCategory = Categories.FirstOrDefault(c => c.Id == category.Id);
+            newCategory.IsSelected = true;
+
+            SelectedCategory = newCategory;
+
+            await GetProducts();
+
         }
 
         //public async Task GetProduct()
@@ -77,9 +164,3 @@ namespace pos.ViewModels
 
     }
 }
-
-//public void HandleProductItems(ProductModel productModel)
-        //{
-        //    var product = Products.FirstOrDefault(x => x.Id == productModel.Id);
-        //    if(productModel.)
-        //}

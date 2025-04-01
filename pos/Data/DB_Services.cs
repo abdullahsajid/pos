@@ -39,6 +39,10 @@ public class DB_Services : IAsyncDisposable
         return await _database.Table<ProductItem>().ToListAsync();
     }
 
+    public async Task<List<ProductItem>> GetProductsByCategory(int categoryId)
+    {
+        return await _database.Table<ProductItem>().Where(x => x.CategoryId == categoryId).ToListAsync();
+    }
 
     public async ValueTask DisposeAsync()
     {

@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using MenuItem = pos.Data.ProductItem;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace pos.ViewModels
 {
@@ -20,9 +21,12 @@ namespace pos.ViewModels
         [ObservableProperty]
         private bool _isLoading;
 
+        [ObservableProperty]
+        private CategoryModel _selectedCategory = null;
+
         private readonly DB_Services _dbServices;
 
-        [ObservableProperty]    
+        [ObservableProperty]
         private MenuItem[] _menuItems = [];
         public ObservableCollection<CartModel> CartItems { get; set; } = new();
 
@@ -51,7 +55,6 @@ namespace pos.ViewModels
                 }
                 UpdateTotal();
             };
-            //Task.Run(async () => await GetCategory());
         }
 
         private void CartItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -88,9 +91,9 @@ namespace pos.ViewModels
             
             await _dbServices.initDatabase();
             await GetCategory();
-            IsLoading = true;
-            await GetProduct();
-            IsLoading = false;
+            //IsLoading = true;
+            await GetProducts();
+            //IsLoading = false;
         }
 
         public async Task GetCategory()
@@ -98,15 +101,45 @@ namespace pos.ViewModels
             try
             {
                 var categoryList = await _dbServices.GetCategory();
+
                 if (categoryList != null)
                 {
                     Categories.Clear();
+                  
                     foreach (var category in categoryList)
                     {
                         Categories.Add(new CategoryModel
                         {
                             Id = category.Id,
                             Name = category.Name
+                        });
+                    }
+                    Categories[1].IsSelected = true;
+
+                    SelectedCategory = Categories[1];
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
+        public async Task GetProducts()
+        {
+            try
+            {
+                var productList = await _dbServices.GetProductsByCategory(SelectedCategory.Id);
+                
+                if (productList != null)
+                {
+                    Products.Clear();
+                    foreach (var product in productList)
+                    {
+                        Products.Add(new ProductModel
+                        {
+                            Id = product.Id,
+                            Name = product.Name,
+                            Price = product.Price
                         });
                     }
                 }
@@ -117,33 +150,53 @@ namespace pos.ViewModels
             }
         }
 
-        public async Task GetProduct()
+        [RelayCommand]
+        private async Task SelectCategoryAsync(CategoryModel category)
         {
-            var products = await _dbServices.GetProducts();
-            Debug.WriteLine($"Products: {products.Count}");
-            //Products = new ObservableCollection<ProductItem>(products);
+            if(SelectedCategory.Id == category.Id)
+            {
+                return;
+            }
+
+            var currentCategory = Categories.FirstOrDefault(c => c.IsSelected);
+            currentCategory.IsSelected = false;
+
+            var newCategory = Categories.FirstOrDefault(c => c.Id == category.Id);
+            newCategory.IsSelected = true;
+
+            SelectedCategory = newCategory;
+
+            await GetProducts();
+
         }
 
         [RelayCommand]
-        public void AddToCart(MenuItem menuItem)
+        public void AddToCart(ProductModel menuItem)
         {
-            var cartitem = CartItems.FirstOrDefault(c => c.itemId == menuItem.Id);
-            if (cartitem == null)
+            try
             {
-                cartitem = new CartModel
+                var cartitem = CartItems.FirstOrDefault(c => c.itemId == menuItem.Id);
+                if (cartitem == null)
                 {
-                    itemId = menuItem.Id,
-                    Name = menuItem.Name,
-                    Price = menuItem.Price,
-                    Quantity = 1
-                };
-                CartItems.Add(cartitem);
-                UpdateTotal();
+                    cartitem = new CartModel
+                    {
+                        itemId = menuItem.Id,
+                        Name = menuItem.Name,
+                        Price = menuItem.Price,
+                        Quantity = 1
+                    };
+                    CartItems.Add(cartitem);
+                    UpdateTotal();
+                }
+                else
+                {
+                    cartitem.Quantity++;
+                    UpdateTotal();
+                }
             }
-            else
+            catch (Exception e)
             {
-                cartitem.Quantity++;
-                UpdateTotal();
+                Debug.WriteLine("Error: " + e.Message);
             }
         }
 

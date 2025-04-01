@@ -1,6 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Collections.ObjectModel;
 namespace pos.Models
 {
@@ -23,9 +21,6 @@ namespace pos.Models
         [ObservableProperty]
         public int _stock;
 
-        //[ObservableProperty]
-        //public int Categories;
-
         public ObservableCollection<CategoryModel> Categories { get; set; } = [];
 
         public CategoryModel[] SelectedCategories => Categories.Where(c => c.IsSelected).ToArray();
@@ -40,10 +35,6 @@ namespace pos.Models
                 OnPropertyChanged();
             }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         public System.DateTime CreatedAt { get; set; } = System.DateTime.Now;
     }
 }
