@@ -21,6 +21,9 @@ namespace pos.ViewModels
         public ObservableCollection<CategoryModel> _categories = new();
 
         [ObservableProperty]
+        public ObservableCollection<CategoryModel> _addProductCategory= new();
+
+        [ObservableProperty]
         public ObservableCollection<ProductModel> _products = new();
 
         [ObservableProperty]
@@ -34,6 +37,9 @@ namespace pos.ViewModels
 
         [ObservableProperty]
         private CategoryModel _selectedCategory = null;
+
+        [ObservableProperty]
+        private CategoryModel _productCategory = null;
 
         [ObservableProperty]
         private ProductItem _currentProduct;
@@ -53,10 +59,14 @@ namespace pos.ViewModels
             try
             {
                var categoryList = await _dbServices.GetCategory();
-               Debug.WriteLine($"CategoryList: {categoryList.Count}");
-                if (categoryList != null)
+               if(categoryList == null || categoryList.Count == 0)
+                {
+                    return;
+                }
+                    if (categoryList != null)
                 {
                     Categories.Clear();
+                    AddProductCategory.Clear();
                     foreach (var category in categoryList)
                     {
                         Categories.Add(new CategoryModel
@@ -64,10 +74,18 @@ namespace pos.ViewModels
                             Id = category.Id,
                             Name = category.Name
                         });
+                        AddProductCategory.Add(new CategoryModel
+                        {
+                            Id = category.Id,
+                            Name = category.Name
+                        });
                     }
+
+                    AddProductCategory[0].IsSelected = true;
                     Categories[1].IsSelected = true;
 
                     SelectedCategory = Categories[1];
+                    ProductCategory = AddProductCategory[0];
                 }
             }
             catch (Exception ex)
@@ -105,11 +123,11 @@ namespace pos.ViewModels
         [RelayCommand]
         private async void SaveProduct()
         {
-            var selectedCategory = Categories.FirstOrDefault(c => c.IsSelected);
+            var ProductCategory = AddProductCategory.FirstOrDefault(c => c.IsSelected);
             if (string.IsNullOrEmpty(CurrentProduct.Name) 
                 || string.IsNullOrEmpty(CurrentProduct.Price.ToString()) 
                 || string.IsNullOrEmpty(CurrentProduct.Description)
-                || selectedCategory == null
+                || ProductCategory == null
             )
             {
                 await Shell.Current.DisplayAlert("Error", "Please fill all fields", "OK");
@@ -120,7 +138,7 @@ namespace pos.ViewModels
                 Name = CurrentProduct.Name,
                 Price = CurrentProduct.Price,
                 Description = CurrentProduct.Description,
-                CategoryId = selectedCategory.Id
+                CategoryId = ProductCategory.Id
             };
             var result = await _dbServices.AddProduct(newProduct);
             if (result > 0)
@@ -129,12 +147,26 @@ namespace pos.ViewModels
                 CurrentProduct = new ProductItem();
 
                 await GetProducts();
-                foreach (var category in Categories)
-                {
-                    category.IsSelected = false;
-                }
+                //foreach (var category in AddProductCategory)
+                //{
+                //    category.IsSelected = false;
+                //}
             }
         }
+        [RelayCommand]
+        private async void ProductsCategory(CategoryModel category)
+        {
+            if (ProductCategory.Id == category.Id)
+            {
+                return;
+            }
+            var currentCategory = AddProductCategory.FirstOrDefault(c => c.IsSelected);
+            currentCategory.IsSelected = false;
+            var newCategory = AddProductCategory.FirstOrDefault(c => c.Id == category.Id);
+            newCategory.IsSelected = true;
+            ProductCategory = newCategory;
+        }
+
 
         [RelayCommand]
         private async Task SelectCategoryAsync(CategoryModel category)

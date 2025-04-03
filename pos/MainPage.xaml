@@ -117,6 +117,17 @@
                             HorizontalTextAlignment="Center"
                             FontAttributes="Bold"
                         />
+                        <Button 
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Margin="10"
+                            Text="Print" 
+                            BackgroundColor="Green" 
+                            TextColor="White" 
+                            CornerRadius="10" 
+                            Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.PrintInvoiceCommand}"
+                            CommandParameter="{Binding .}"
+                        />
                     </Grid>
                 </Border>
             </VerticalStackLayout>

@@ -64,7 +64,7 @@
                     </VerticalStackLayout>
                     <VerticalStackLayout>
                         <Label Text="Categories" Style="{StaticResource lbl}" FontAttributes="Bold"/>
-                        <CollectionView ItemsSource="{Binding Categories}">
+                        <CollectionView ItemsSource="{Binding AddProductCategory}">
                             <CollectionView.ItemsLayout>
                                 <GridItemsLayout
                                     HorizontalItemSpacing="3"
@@ -76,12 +76,36 @@
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="models:CategoryModel">
                                     <Border 
-                                        BackgroundColor="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}}" HeightRequest="40" StrokeShape="RoundRectangle 10"
+                                        HeightRequest="40" 
+                                        StrokeShape="RoundRectangle 10"
+                                        Padding="20,10"
+                                        StrokeThickness="2"
+                                        BackgroundColor="#FFF3EA"
+                                        Stroke="White"
                                      >
-                                        <Label Text="{Binding Name}" TextColor="Black" VerticalOptions="Center" HorizontalOptions="Center"/>
+                                        <Label Text="{Binding Name}" TextColor="#753F21">
+                                            <Label.Triggers>
+                                                <DataTrigger
+                                                    Binding="{Binding IsSelected}"
+                                                    TargetType="Label"
+                                                    Value="True"
+                                                >
+                                                    <Setter Property="TextColor" Value="White"/>
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                        <Border.Triggers>
+                                            <DataTrigger
+                                                    Binding="{Binding IsSelected}" 
+                                                    TargetType="Border"
+                                                    Value="True"
+                                            >
+                                                <Setter Property="BackgroundColor" Value="#753F21"/>
+                                            </DataTrigger>
+                                        </Border.Triggers>
                                         <Border.GestureRecognizers>
                                             <TapGestureRecognizer 
-                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectCategoryCommand}"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ProductsCategoryCommand}"
                                                     CommandParameter="{Binding .}"/>
                                         </Border.GestureRecognizers>
                                     </Border>

@@ -23,7 +23,19 @@ namespace pos
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            return new Window(new AppShell());
+            var window = new Window(new AppShell());
+
+            var displayInfo = DeviceDisplay.Current.MainDisplayInfo;
+
+            window.MaximumWidth = double.PositiveInfinity;
+            window.MaximumHeight = double.PositiveInfinity;
+            window.Width = displayInfo.Width / displayInfo.Density;
+            window.Height = displayInfo.Height / displayInfo.Density;
+
+            window.X = 0;
+            window.Y = 0;
+
+            return window;
         }
     }
 }

@@ -13,5 +13,8 @@ namespace pos.Data
         public string Barcode { get; set; }
 
         public int CategoryId { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
     }
 }
