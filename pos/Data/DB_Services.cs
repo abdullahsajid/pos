@@ -44,6 +44,15 @@ public class DB_Services : IAsyncDisposable
         return await _database.Table<ProductItem>().Where(x => x.CategoryId == categoryId).ToListAsync();
     }
 
+    public async Task<List<ProductItem>> GetProductAndCategoryById(int menuId)
+    {
+        var query = @"SELECT p.*, c.Name AS CategoryName
+                      FROM ProductItem p
+                      INNER JOIN MenuCategory c ON p.CategoryId = c.Id
+                        WHERE p.Id = ?";
+        return await _database.QueryAsync<ProductItem>(query,menuId);
+    }
+
     public async ValueTask DisposeAsync()
     {
         if (_database != null)

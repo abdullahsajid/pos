@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using pos.Data;
 using pos.Pages;
 using pos.ViewModels;
+using Syncfusion.Maui.Core.Hosting;
 
 namespace pos;
 
@@ -13,7 +14,7 @@ public static class MauiProgram
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
-			.ConfigureFonts(fonts =>
+            .ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
