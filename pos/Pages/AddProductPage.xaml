@@ -162,7 +162,7 @@
             </ScrollView>
         </Grid>
         <Grid Grid.Column="1" RowDefinitions="Auto, Auto, *" RowSpacing="10">
-            <CollectionView Grid.Row="1" ItemsSource="{Binding Categories}" HorizontalOptions="Center" HorizontalScrollBarVisibility="Default">
+            <CollectionView Grid.Row="0" ItemsSource="{Binding Categories}" HorizontalOptions="Center" HorizontalScrollBarVisibility="Default">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout ItemSpacing="10" Orientation="Horizontal"/>
                 </CollectionView.ItemsLayout>
@@ -173,7 +173,7 @@
                             StrokeShape="RoundRectangle 10"
                             BackgroundColor="#FFF3EA"
                             Stroke="White"
-                            >   
+                            >
                             <HorizontalStackLayout Spacing="5">
                                 <Label Text="{Binding Name}" TextColor="#753F21">
                                     <Label.Triggers>
@@ -205,31 +205,28 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-            <Grid RowDefinitions="Auto, Auto, Auto" Padding="20">
-                <Grid Grid.Row="1" ColumnDefinitions="*,*" BackgroundColor="#A67B5B" Padding="10" Margin="0,20,0,0">
+            <Grid Grid.Row="1" ColumnDefinitions="*,*" BackgroundColor="#A67B5B" Padding="10" Margin="0,20,0,0">
                     <Label Text="Cake Name" Grid.Column="0" TextColor="White" FontAttributes="Bold" FontSize="16" />
                     <Label Text="Price (Rs)" Grid.Column="1" TextColor="White" FontAttributes="Bold" FontSize="16" />
                 </Grid>
-                <CollectionView Grid.Row="2" 
+            <CollectionView Grid.Row="2" 
                                 x:Name="ProductListView"
                        ItemsSource="{Binding Products}" 
                       >
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="models:ProductModel">
-                            <Grid ColumnDefinitions="*,*" Padding="10" BackgroundColor="Transparent">
-                                <Frame Grid.ColumnSpan="2" BackgroundColor="Transparent" BorderColor="#DDD0C8" Padding="0" Margin="0" HasShadow="False" />
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:ProductModel">
+                        <Grid ColumnDefinitions="*,*" Padding="10" BackgroundColor="Transparent">
+                            <Frame Grid.ColumnSpan="2" BackgroundColor="Transparent" BorderColor="#DDD0C8" Padding="0" Margin="0" HasShadow="False" />
 
-                                
-                                <Entry Text="{Binding Name}" Grid.Column="0" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
 
-                                
-                                <Entry Text="{Binding Price}" Grid.Column="1" FontSize="16" Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" />
-                            </Grid>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-         
-            </Grid>
+                            <Entry Text="{Binding Name}" Grid.Column="0" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
+
+
+                            <Entry Text="{Binding Price}" Grid.Column="1" FontSize="16" Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </Grid>
     </Grid>
 </ContentPage>
