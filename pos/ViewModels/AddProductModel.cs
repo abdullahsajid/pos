@@ -4,8 +4,7 @@ using pos.Data;
 using pos.Models;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Windows.Input;
-using Products = pos.Data.ProductItem;
+//using Products = pos.Data.ProductItem;
 
 namespace pos.ViewModels
 {
@@ -24,7 +23,7 @@ namespace pos.ViewModels
         public ObservableCollection<CategoryModel> _addProductCategory= new();
 
         [ObservableProperty]
-        public ObservableCollection<ProductModel> _products = new();
+        public ObservableCollection<ProductItem> _products = new();
 
         [ObservableProperty]
         private MenuItem[] _menuItems = [];
@@ -105,7 +104,7 @@ namespace pos.ViewModels
                     Products.Clear();
                     foreach (var product in productList)
                     {
-                        Products.Add(new ProductModel
+                        Products.Add(new ProductItem
                         {
                             Id = product.Id,
                             Name = product.Name,
@@ -123,36 +122,64 @@ namespace pos.ViewModels
         [RelayCommand]
         private async void SaveProduct()
         {
-            var ProductCategory = AddProductCategory.FirstOrDefault(c => c.IsSelected);
-            if (string.IsNullOrEmpty(CurrentProduct.Name) 
-                || string.IsNullOrEmpty(CurrentProduct.Price.ToString()) 
-                || string.IsNullOrEmpty(CurrentProduct.Description)
-                || ProductCategory == null
-            )
+            try
             {
-                await Shell.Current.DisplayAlert("Error", "Please fill all fields", "OK");
-                return;
-            }
-            var newProduct = new ProductItem
-            {
-                Name = CurrentProduct.Name,
-                Price = CurrentProduct.Price,
-                Description = CurrentProduct.Description,
-                CategoryId = ProductCategory.Id
-            };
-            var result = await _dbServices.AddProduct(newProduct);
-            if (result > 0)
-            {
-                await Shell.Current.DisplayAlert("Success", "Product saved successfully", "OK");
-                CurrentProduct = new ProductItem();
+                var ProductCategory = AddProductCategory.FirstOrDefault(c => c.IsSelected);
+                if (string.IsNullOrEmpty(CurrentProduct.Name)
+                    || string.IsNullOrEmpty(CurrentProduct.Price.ToString())
+                    || string.IsNullOrEmpty(CurrentProduct.Description)
+                    || ProductCategory == null
+                )
+                {
+                    await Shell.Current.DisplayAlert("Error", "Please fill all fields", "OK");
+                    return;
+                }
+                var newProduct = new ProductItem
+                {
+                    Name = CurrentProduct.Name,
+                    Price = CurrentProduct.Price,
+                    Description = CurrentProduct.Description,
+                    CategoryId = ProductCategory.Id
+                };
+                var result = await _dbServices.AddProduct(newProduct);
+                if (result > 0)
+                {
+                    CurrentProduct = new ProductItem();
 
-                await GetProducts();
-                //foreach (var category in AddProductCategory)
-                //{
-                //    category.IsSelected = false;
-                //}
+                    await GetProducts();
+                    //foreach (var category in AddProductCategory)
+                    //{
+                    //    category.IsSelected = false;
+                    //}
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", "Something went wrong!", "OK");
             }
         }
+
+        [RelayCommand]
+        public async void UpdateItem(ProductItem product)
+        {
+            try
+            {
+                Debug.WriteLine("UpdateItem called");
+                Debug.WriteLine("Product ID: " + product.Id);
+                var result = await _dbServices.UpdateProductById(product);
+                Debug.WriteLine("Result: " + result);
+                if (result > 0)
+                {
+                    await GetProducts();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error: " + ex.Message);
+                await Shell.Current.DisplayAlert("Error", "Something went wrong!", "OK");
+            }
+        }
+
         [RelayCommand]
         private async void ProductsCategory(CategoryModel category)
         {

@@ -1,6 +1,5 @@
-using pos.Data;
-using pos.Models;
 using SQLite;
+using System.Diagnostics;
 
 namespace pos.Data;
 
@@ -51,6 +50,19 @@ public class DB_Services : IAsyncDisposable
                       INNER JOIN MenuCategory c ON p.CategoryId = c.Id
                         WHERE p.Id = ?";
         return await _database.QueryAsync<ProductItem>(query,menuId);
+    }
+
+    public async Task<int> UpdateProductById(ProductItem product)
+    {
+        Debug.WriteLine("UpdateProductById called"+product.Id);
+        var products = await _database.Table<ProductItem>().Where(x => x.Id == product.Id).FirstOrDefaultAsync();
+        if (products == null)
+        {
+            return 0;
+        }
+        products.Name = product.Name;
+        products.Price = product.Price;
+        return await _database.UpdateAsync(products);
     }
 
     public async ValueTask DisposeAsync()

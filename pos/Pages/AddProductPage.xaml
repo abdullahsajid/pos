@@ -114,12 +114,6 @@
                     </VerticalStackLayout>
                     <Grid ColumnDefinitions="*,*">
                         <Button
-                            Grid.Column="0"
-                            BackgroundColor="red"
-                            HorizontalOptions="Start"
-                            Text="Cancel"
-                            TextColor="White" />
-                        <Button
                             Grid.Column="1"
                             BackgroundColor="Green"    
                             Text="Save"
@@ -128,7 +122,7 @@
                         />    
                     </Grid>
                     <ScrollView>
-                        <VerticalStackLayout Spacing="10">
+                        <VerticalStackLayout Spacing="10" Margin="20">
                             <VerticalStackLayout Spacing="2">
                                 <Label Style="{StaticResource lbl}" FontAttributes="Bold" Text="Name" TextColor="Black"/>
                                 <Entry
@@ -143,13 +137,6 @@
                     </ScrollView>
                     <Grid ColumnDefinitions="*,*">
                         <Button
-                            Grid.Column="0"
-                            BackgroundColor="red"
-                            HorizontalOptions="Start"
-                            Text="Cancel"
-                            TextColor="White" 
-                        />
-                        <Button
                             Grid.Column="1"
                             BackgroundColor="Green"    
                             Text="Save"
@@ -161,7 +148,7 @@
                 </VerticalStackLayout>
             </ScrollView>
         </Grid>
-        <Grid Grid.Column="1" RowDefinitions="Auto, Auto, *" RowSpacing="10">
+        <Grid Grid.Column="1" Margin="20" RowDefinitions="Auto, Auto, *" RowSpacing="10">
             <CollectionView Grid.Row="0" ItemsSource="{Binding Categories}" HorizontalOptions="Center" HorizontalScrollBarVisibility="Default">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout ItemSpacing="10" Orientation="Horizontal"/>
@@ -205,24 +192,34 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-            <Grid Grid.Row="1" ColumnDefinitions="*,*" BackgroundColor="#A67B5B" Padding="10" Margin="0,20,0,0">
+            <Grid Grid.Row="1" ColumnDefinitions="*,*,Auto" BackgroundColor="#A67B5B" Padding="10" Margin="0,20,0,0">
                     <Label Text="Cake Name" Grid.Column="0" TextColor="White" FontAttributes="Bold" FontSize="16" />
                     <Label Text="Price (Rs)" Grid.Column="1" TextColor="White" FontAttributes="Bold" FontSize="16" />
-                </Grid>
+                    <Label Text="Actions" Grid.Column="2" TextColor="White" FontAttributes="Bold" FontSize="16" />
+            </Grid>
             <CollectionView Grid.Row="2" 
                                 x:Name="ProductListView"
                        ItemsSource="{Binding Products}" 
                       >
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:ProductModel">
-                        <Grid ColumnDefinitions="*,*" Padding="10" BackgroundColor="Transparent">
-                            <Frame Grid.ColumnSpan="2" BackgroundColor="Transparent" BorderColor="#DDD0C8" Padding="0" Margin="0" HasShadow="False" />
+                    <DataTemplate x:DataType="data:ProductItem">
+                        <Grid ColumnDefinitions="*,*,Auto" Padding="10" BackgroundColor="Transparent">
+                            <Frame Grid.ColumnSpan="3" BackgroundColor="Transparent" BorderColor="#DDD0C8" Padding="0" Margin="0" HasShadow="False" />
 
 
                             <Entry Text="{Binding Name}" Grid.Column="0" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
 
 
                             <Entry Text="{Binding Price}" Grid.Column="1" FontSize="16" Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" />
+                            <Grid Grid.Column="2" ColumnDefinitions="Auto, Auto" HorizontalOptions="End">
+                                <Button
+                                    Text="Update"
+                                    BackgroundColor="Green"
+                                    TextColor="White"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UpdateItemCommand}"
+                                    CommandParameter="{Binding .}"
+                                />
+                            </Grid>
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
