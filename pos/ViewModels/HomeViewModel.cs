@@ -213,9 +213,35 @@ namespace pos.ViewModels
             UpdateTotal();
         }
         [RelayCommand]
-        public void PrintInvoice()
+        public async void PrintInvoice()
         {
             Debug.WriteLine("Printing Invoice");
+            var orderNumber = await _dbServices.GetNextOrderNumber();
+
+            var order = new Order
+            {
+                OrderNumber = $"ORD-{orderNumber}",
+                OrderDate = DateTime.Now,
+                TotalAmount = Total,
+                PaymentAmount = decimal.TryParse(Payment, out decimal paymentAmount) ? paymentAmount : 0,
+                ChangeAmount = decimal.TryParse(Change, out decimal changeAmount) ? changeAmount : 0
+            };
+
+            await _dbServices.AddOrder(order);
+
+            foreach (var item in CartItems)
+            {
+                var orderItem = new OrderItem
+                {
+                    OrderId = order.Id,
+                    ProductId = item.itemId,
+                    Quantity = item.Quantity,
+                    ProductName = item.Name,
+                    CreatedDate = DateTime.Now,
+                    UnitPrice = item.Price
+                };
+                await _dbServices.AddOrderItem(orderItem);
+            }
             PrintDocument printDoc = new PrintDocument();
 
             printDoc.PrintPage += PrintPageHandler;

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="pos.Pages.OrderPage"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             Title="OrderPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#FFF3EA"
+             xmlns:models="clr-namespace:pos.Models"
+             xmlns:data="clr-namespace:pos.Data"
+             xmlns:vm="clr-namespace:pos.ViewModels"
+             x:DataType="vm:OrderModel"
+             >
+    <Grid RowDefinitions="Auto, *">
+        <Grid Grid.Row="0" ColumnDefinitions="*,*,*,*,*"  BackgroundColor="#A67B5B" Padding="10">
+            <Label Text="Order#" Grid.Column="0" TextColor="White" FontAttributes="Bold" FontSize="16" />
+            <Label Text="Date" Grid.Column="1" TextColor="White" FontAttributes="Bold" FontSize="16" />
+            <Label Text="Totol Amount" Grid.Column="2" TextColor="White" FontAttributes="Bold" FontSize="16" />
+            <Label Text="Payment Amount" Grid.Column="3" TextColor="White" FontAttributes="Bold" FontSize="16" />
+            <Label Text="Change Amount" Grid.Column="4" TextColor="White" FontAttributes="Bold" FontSize="16" />
+        </Grid>
+        <CollectionView Grid.Row="1" 
+           ItemsSource="{Binding Orders}"
+           SelectionMode="Single"
+           SelectionChanged="OnSelectionChanged"
+        >
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="data:Order">
+                    <Grid ColumnDefinitions="*,*,*,*,*" RowDefinitions="Auto,Auto" Padding="10" BackgroundColor="Transparent">
+                        <Label Text="{Binding OrderNumber}" Grid.Column="0" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
+                        <Label Text="{Binding OrderDate, StringFormat='{0:dd/MM/yyyy}'}" Grid.Column="1" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
+                        <Label Text="{Binding TotalAmount}" Grid.Column="2" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
+                        <Label Text="{Binding PaymentAmount}" Grid.Column="3" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
+                        <Label Text="{Binding ChangeAmount}" Grid.Column="4" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
+                        <Border Grid.Row="1" 
+                            Grid.ColumnSpan="5" 
+                            Stroke="#DDD0C8" 
+                            StrokeThickness="2" 
+                            Margin="0,5,0,0" 
+                            HeightRequest="2" 
+                            HorizontalOptions="FillAndExpand">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="0" />
+                            </Border.StrokeShape>
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

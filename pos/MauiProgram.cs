@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Logging;
 using pos.Data;
 using pos.Pages;
+using pos.Popups;
 using pos.ViewModels;
-using Syncfusion.Maui.Core.Hosting;
 
 namespace pos;
 
@@ -29,6 +29,10 @@ public static class MauiProgram
         builder.Services.AddSingleton<MainPage>();
 		builder.Services.AddSingleton<AddProductModel>();
 		builder.Services.AddSingleton<AddProductPage>();
+        builder.Services.AddSingleton<OrderModel>();
+        builder.Services.AddSingleton<OrderPage>();
+        builder.Services.AddTransientPopup<OrderItemPopup, OrderModel>();
+        //builder.Services.AddSingleton<OrderItemPopup>();
 
         return builder.Build();
 	}

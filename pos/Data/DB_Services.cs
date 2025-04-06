@@ -17,6 +17,8 @@ public class DB_Services : IAsyncDisposable
     {
         await _database.CreateTableAsync<ProductItem>();
         await _database.CreateTableAsync<MenuCategory>();
+        await _database.CreateTableAsync<Order>();
+        await _database.CreateTableAsync<OrderItem>();
     }
 
     public async Task<int> AddCategory(MenuCategory category)
@@ -26,6 +28,33 @@ public class DB_Services : IAsyncDisposable
     public async Task<int> AddProduct(ProductItem product)
     {
         return await _database.InsertAsync(product);
+    }
+
+    public async Task<int> AddOrder(Order order)
+    {
+        return await _database.InsertAsync(order);
+    }
+
+    public async Task<int> AddOrderItem(OrderItem orderItem)
+    {
+        return await _database.InsertAsync(orderItem);
+    }
+
+    public async Task<string> GetNextOrderNumber()
+    {
+        var orderCounter = await _database.Table<Order>().CountAsync();
+
+        return orderCounter.ToString();
+    }
+
+    public async Task<List<Order>> GetOrder()
+    {
+        return await _database.Table<Order>().ToListAsync();
+    }
+
+    public async Task<List<OrderItem>> GetOrderItems(long orderId)
+    {
+        return await _database.Table<OrderItem>().Where(x => x.OrderId == orderId).ToListAsync();
     }
 
     public async Task<List<MenuCategory>> GetCategory()

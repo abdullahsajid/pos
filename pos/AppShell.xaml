@@ -14,12 +14,21 @@
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
         Icon="home.png"
-        Route="MainPage" />
+        Route="MainPage"
+    />
 
     <ShellContent
         Title="Product"
         ContentTemplate="{DataTemplate pages:AddProductPage}"
         Icon="grid.png"
-        Route="AddProductPage" />
+        Route="AddProductPage" 
+    />
+
+    <ShellContent
+        Title="Order"
+        ContentTemplate="{DataTemplate pages:OrderPage}"
+        Icon="home.png"
+        Route="OrderPage"
+    />
 
 </Shell>

@@ -111,25 +111,25 @@
                     FontAttributes="Bold"
                 />
                         <Label 
-                    Grid.Row="2"
-                    Grid.Column="1"
-                    FontSize="23"
-                    Text="{Binding Total, StringFormat='{0:C}'}" 
-                    TextColor="Black" 
-                    HorizontalTextAlignment="Center"
-                    FontAttributes="Bold"
-                />
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            FontSize="23"
+                            Text="{Binding Total, StringFormat='{0:C}'}" 
+                            TextColor="Black" 
+                            HorizontalTextAlignment="Center"
+                            FontAttributes="Bold"
+                        />
                         <Button 
-                    Grid.Row="3"
-                    Grid.Column="1"
-                    Margin="10"
-                    Text="Print" 
-                    BackgroundColor="Green" 
-                    TextColor="White" 
-                    CornerRadius="10" 
-                    Command="{Binding PrintInvoiceCommand}"
-                    CommandParameter="{Binding .}"
-                />
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Margin="10"
+                            Text="Print" 
+                            BackgroundColor="Green" 
+                            TextColor="White" 
+                            CornerRadius="10" 
+                            Command="{Binding PrintInvoiceCommand}"
+                            CommandParameter="{Binding .}"
+                        />
                     </Grid>
                 </Border>
             </VerticalStackLayout>
