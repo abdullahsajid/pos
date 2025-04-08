@@ -81,9 +81,9 @@ namespace pos.ViewModels
                     }
 
                     AddProductCategory[0].IsSelected = true;
-                    Categories[1].IsSelected = true;
+                    Categories[0].IsSelected = true;
 
-                    SelectedCategory = Categories[1];
+                    SelectedCategory = Categories[0];
                     ProductCategory = AddProductCategory[0];
                 }
             }
@@ -97,6 +97,11 @@ namespace pos.ViewModels
         {
             try
             {
+                if (SelectedCategory == null)
+                {
+                    Products.Clear();
+                    return;
+                }
                 var productList = await _dbServices.GetProductsByCategory(SelectedCategory.Id);
                 
                 if (productList != null)

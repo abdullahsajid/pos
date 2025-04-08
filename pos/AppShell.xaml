@@ -27,8 +27,15 @@
     <ShellContent
         Title="Order"
         ContentTemplate="{DataTemplate pages:OrderPage}"
-        Icon="home.png"
+        Icon="clipboard.png"
         Route="OrderPage"
     />
+
+    <ShellContent
+        Title="Deals"
+        ContentTemplate="{DataTemplate pages:AddDealPage}"
+        Icon="grid.png"
+        Route="AddDealPage"
+        />
 
 </Shell>

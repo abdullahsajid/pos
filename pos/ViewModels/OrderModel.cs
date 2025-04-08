@@ -4,19 +4,18 @@ using CommunityToolkit.Mvvm.Input;
 using pos.Data;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using pos.Popups;
-using CommunityToolkit.Maui.Core.Extensions;
+using System.Text;
 
 namespace pos.ViewModels
 {
     public partial class OrderModel : ObservableObject
     {
         private readonly DB_Services _dbServices;
-        private readonly IPopupService popupService;
-        public OrderModel(DB_Services db_Services,IPopupService popupService)
+        private readonly IPopupService _popupService;
+        public OrderModel(DB_Services dbServices, IPopupService popupService)
         {
-            _dbServices = db_Services;
-            this.popupService = popupService;
+            _dbServices = dbServices;
+            _popupService = popupService;
         }
 
         [ObservableProperty]
@@ -62,15 +61,31 @@ namespace pos.ViewModels
                     return;
                 }
 
-                Debug.WriteLine($"ShowOrderItems called for Order ID: {order.Id}");
-                Debug.WriteLine("Creating OrderItemsPopup...");
-                var popup = new OrderItemPopup(order, _dbServices);
-                Debug.WriteLine($"OrderItemsPopup created for Order ID: {popup}");
-                Debug.WriteLine("OrderItemsPopup created successfully.");
-                Debug.WriteLine("Showing popup...");
-                //await this.popupService.ShowPopupAsync(popup);
-                this.popupService.ShowPopup(popup);
-                Debug.WriteLine("Popup shown successfully.");
+                var orderItems = await _dbServices.GetOrderItems(order.Id);
+
+                if(orderItems == null || orderItems.Count == 0)
+                {
+                    await Shell.Current.DisplayAlert("No Items", "No items found for this order.", "OK");
+                    return;
+                }
+
+                StringBuilder message = new StringBuilder();
+                message.AppendLine($"Order #{order.Id}");
+                message.AppendLine($"Date: {order.OrderDate}");
+                message.AppendLine();
+                message.AppendLine("Items:");
+
+                decimal total = 0;
+                foreach (var item in orderItems)
+                {
+                    message.AppendLine($"- {item.ProductName} (x{item.Quantity}): {item.UnitPrice * item.Quantity:C}");
+                    total += item.UnitPrice * item.Quantity;
+                }
+
+                message.AppendLine();
+                message.AppendLine($"Total: {total:C}");
+
+                await Shell.Current.DisplayAlert($"Order Details", message.ToString(), "Close");
             }
             catch (Exception ex)
             {

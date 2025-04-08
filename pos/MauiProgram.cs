@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using pos.Data;
 using pos.Pages;
-using pos.Popups;
 using pos.ViewModels;
 
 namespace pos;
@@ -14,7 +13,7 @@ public static class MauiProgram
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
-            .ConfigureFonts(fonts =>
+			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
@@ -31,8 +30,9 @@ public static class MauiProgram
 		builder.Services.AddSingleton<AddProductPage>();
         builder.Services.AddSingleton<OrderModel>();
         builder.Services.AddSingleton<OrderPage>();
-        builder.Services.AddTransientPopup<OrderItemPopup, OrderModel>();
-        //builder.Services.AddSingleton<OrderItemPopup>();
+		builder.Services.AddSingleton<AddDealModel>();
+		builder.Services.AddSingleton<AddDealPage>();
+
 
         return builder.Build();
 	}

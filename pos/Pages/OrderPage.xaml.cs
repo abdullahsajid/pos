@@ -1,5 +1,6 @@
 using pos.ViewModels;
 using pos.Data;
+using System.Diagnostics;
 namespace pos.Pages;
 
 public partial class OrderPage : ContentPage
@@ -20,7 +21,7 @@ public partial class OrderPage : ContentPage
     {
         if (e.CurrentSelection.FirstOrDefault() is Order selectedOrder)
         {
-            // Call the ShowOrderItemsCommand from the view model
+            Debug.WriteLine($"Selected Order: {selectedOrder.OrderNumber}");
             await _viewModel.ShowOrderItemsCommand.ExecuteAsync(selectedOrder);
         }
     }

@@ -115,9 +115,9 @@ namespace pos.ViewModels
                             Name = category.Name
                         });
                     }
-                    Categories[1].IsSelected = true;
+                    Categories[0].IsSelected = true;
 
-                    SelectedCategory = Categories[1];
+                    SelectedCategory = Categories[0];
                 }
             }
             catch (Exception ex)
@@ -129,6 +129,11 @@ namespace pos.ViewModels
         {
             try
             {
+                if (SelectedCategory == null)
+                {
+                    Products.Clear();
+                    return;
+                }
                 var productList = await _dbServices.GetProductsByCategory(SelectedCategory.Id);
                 
                 if (productList != null)
