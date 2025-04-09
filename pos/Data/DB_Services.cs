@@ -19,6 +19,8 @@ public class DB_Services : IAsyncDisposable
         await _database.CreateTableAsync<MenuCategory>();
         await _database.CreateTableAsync<Order>();
         await _database.CreateTableAsync<OrderItem>();
+        await _database.CreateTableAsync<Deal>();
+        await _database.CreateTableAsync<DealItem>();
     }
 
     public async Task<int> AddCategory(MenuCategory category)
@@ -45,6 +47,26 @@ public class DB_Services : IAsyncDisposable
         var orderCounter = await _database.Table<Order>().CountAsync();
 
         return orderCounter.ToString();
+    }
+
+    public async Task<int> AddDeal(Deal deal)
+    {
+        return await _database.InsertAsync(deal);
+    }
+
+    public async Task<int> AddDealItem(DealItem dealItem)
+    {
+        return await _database.InsertAsync(dealItem);
+    }
+
+    public async Task<List<Deal>> GetDeal()
+    {
+        return await _database.Table<Deal>().ToListAsync();
+    }
+
+    public async Task<List<DealItem>> GetDealItem(long dealId)
+    {
+        return await _database.Table<DealItem>().Where(x => x.DealId == dealId).ToListAsync();
     }
 
     public async Task<List<Order>> GetOrder()
@@ -83,7 +105,6 @@ public class DB_Services : IAsyncDisposable
 
     public async Task<int> UpdateProductById(ProductItem product)
     {
-        Debug.WriteLine("UpdateProductById called"+product.Id);
         var products = await _database.Table<ProductItem>().Where(x => x.Id == product.Id).FirstOrDefaultAsync();
         if (products == null)
         {
@@ -92,6 +113,38 @@ public class DB_Services : IAsyncDisposable
         products.Name = product.Name;
         products.Price = product.Price;
         return await _database.UpdateAsync(products);
+    }
+
+    public async Task<int> UpdateDealById(Deal deal)
+    {
+        var deals = await _database.Table<Deal>().Where(x => x.Id == deal.Id).FirstOrDefaultAsync();
+        if (deals == null)
+        {
+            return 0;
+        }
+        deals.DealName = deal.DealName;
+        deals.DealAmount = deal.DealAmount;
+        return await _database.UpdateAsync(deals);
+    }
+
+    public async Task<int> DeleteDealById(Deal deal)
+    {
+        var deals = await _database.Table<Deal>().Where(x => x.Id == deal.Id).FirstOrDefaultAsync();
+        if (deals == null)
+        {
+            return 0;
+        }
+        var dealItems = await _database.Table<DealItem>().Where(x => x.DealId == deal.Id).ToListAsync();
+
+        if(dealItems != null)
+        {
+            foreach (var item in dealItems)
+            {
+                await _database.DeleteAsync(item);
+            }
+        }
+        
+        return await _database.DeleteAsync(deals);
     }
 
     public async ValueTask DisposeAsync()

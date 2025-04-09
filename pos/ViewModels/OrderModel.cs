@@ -35,13 +35,7 @@ namespace pos.ViewModels
                 if (orderList != null)
                 {
                     Orders.Clear();
-                    foreach (var order in orderList)
-                    {
-                        Orders.Add(order);
-                        Debug.WriteLine($"Order Number: {order.OrderNumber}");
-                        Debug.WriteLine($"Order Date: {order.OrderDate}");
-                        Debug.WriteLine($"Order Total: {order.ChangeAmount}");
-                    }
+                    Orders = new ObservableCollection<Order>(orderList);
                 }
             }
             catch (Exception ex)

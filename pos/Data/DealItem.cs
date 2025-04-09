@@ -24,7 +24,13 @@ namespace pos.Data
         [ObservableProperty,NotifyPropertyChangedFor(nameof(SubTotal))]
         private int _quantity = 1;
 
-        public decimal SubTotal => _quantity * _unitPrice;
+        private decimal _subTotal;
+
+        public decimal SubTotal
+        {
+            get => _quantity * _unitPrice;
+            set => _subTotal = value;
+        }
 
     }
 }

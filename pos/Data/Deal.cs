@@ -16,5 +16,8 @@ namespace pos.Data
         public DateTime OrderDate { get; set; }
 
         public decimal DealAmount { get; set; }
+
+        [Ignore]
+        public List<DealItem> DealItems { get; set; } = new List<DealItem>();
     }
 }

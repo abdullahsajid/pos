@@ -25,155 +25,204 @@
     </ContentPage.Resources>
     
     <Grid ColumnDefinitions=".40*, .60*">
-        <Grid Grid.Column="0" Margin="20" Padding="10" RowDefinitions="Auto, *, Auto" BackgroundColor="White">
-            <ScrollView>
-                <VerticalStackLayout Spacing="15">
-                    <VerticalStackLayout>
-                        <Label Text="Categories" Style="{StaticResource lbl}" FontAttributes="Bold"/>
-                        <CollectionView ItemsSource="{Binding AddProductCategory}">
-                            <CollectionView.ItemsLayout>
-                                <GridItemsLayout
-                                HorizontalItemSpacing="3"
-                                Orientation="Vertical"
-                                Span="3"
-                                VerticalItemSpacing="3"
-                            />
-                            </CollectionView.ItemsLayout>
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="models:CategoryModel">
-                                    <Border 
-                                        HeightRequest="40" 
-                                        StrokeShape="RoundRectangle 10"
-                                        Padding="20,10"
-                                        StrokeThickness="2"
-                                        BackgroundColor="#FFF3EA"
-                                        Stroke="White"
+        <Grid Grid.Column="0" Margin="20" Padding="10" RowDefinitions="Auto,Auto, *, Auto" BackgroundColor="White">
+            <VerticalStackLayout Grid.Row="0" Spacing="15">
+                <Label Text="Categories" Style="{StaticResource lbl}" FontAttributes="Bold"/>
+                <CollectionView ItemsSource="{Binding AddProductCategory}">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout
+                    HorizontalItemSpacing="3"
+                    Orientation="Vertical"
+                    Span="3"
+                    VerticalItemSpacing="3"
+                    />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:CategoryModel">
+                            <Border 
+                            HeightRequest="40" 
+                            StrokeShape="RoundRectangle 10"
+                            Padding="20,10"
+                            StrokeThickness="2"
+                            BackgroundColor="#FFF3EA"
+                            Stroke="White"
+                            >
+                                <Label Text="{Binding Name}" TextColor="#753F21">
+                                    <Label.Triggers>
+                                        <DataTrigger
+                                        Binding="{Binding IsSelected}"
+                                        TargetType="Label"
+                                        Value="True"
                                         >
-                                        <Label Text="{Binding Name}" TextColor="#753F21">
-                                            <Label.Triggers>
-                                                <DataTrigger
-                                                    Binding="{Binding IsSelected}"
-                                                    TargetType="Label"
-                                                    Value="True"
-                                                    >
-                                                    <Setter Property="TextColor" Value="White"/>
-                                                </DataTrigger>
-                                            </Label.Triggers>
-                                        </Label>
-                                        <Border.Triggers>
-                                            <DataTrigger
-                                                Binding="{Binding IsSelected}" 
-                                                TargetType="Border"
-                                                Value="True"
-                                                >
-                                                <Setter Property="BackgroundColor" Value="#753F21"/>
-                                            </DataTrigger>
-                                        </Border.Triggers>
-                                        <Border.GestureRecognizers>
-                                            <TapGestureRecognizer 
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ProductsCategoryCommand}"
-                                                CommandParameter="{Binding .}"/>
-                                        </Border.GestureRecognizers>
-                                    </Border>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
+                                            <Setter Property="TextColor" Value="White"/>
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                                <Border.Triggers>
+                                    <DataTrigger
+                                    Binding="{Binding IsSelected}" 
+                                    TargetType="Border"
+                                    Value="True"
+                                    >
+                                        <Setter Property="BackgroundColor" Value="#753F21"/>
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer 
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ProductsCategoryCommand}"
+                                    CommandParameter="{Binding .}"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+            <VerticalStackLayout Grid.Row="1" Spacing="15" Margin="0,15,0,0">
+                <VerticalStackLayout Spacing="10">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Style="{StaticResource lbl}" FontAttributes="Bold" Text="Name" TextColor="Black"/>
+                        <Entry
+                        Placeholder="Enter Deal Name"
+                        PlaceholderColor="Black"
+                        TextColor="Black"
+                        Style="{StaticResource txt}"
+                        Text="{Binding DealName}"
+                    />
                     </VerticalStackLayout>
-                    <VerticalStackLayout Spacing="10">
-                        <VerticalStackLayout Spacing="2">
-                            <Label Style="{StaticResource lbl}" FontAttributes="Bold" Text="Name" TextColor="Black"/>
-                            <Entry
-                                Placeholder="Enter Deal Name"
-                                PlaceholderColor="Black"
-                                TextColor="Black"
-                                Style="{StaticResource txt}"
-                                Text="{Binding DealName}"
-                        />
-                        </VerticalStackLayout>
-                        <VerticalStackLayout Spacing="2">
-                            <Label Style="{StaticResource lbl}" FontAttributes="Bold" Text="Price" TextColor="Black"/>
-                            <Entry
-                                Placeholder="Enter Total Amount"
-                                PlaceholderColor="Black"
-                                TextColor="Black"
-                                Style="{StaticResource txt}"
-                                Keyboard="Numeric"
-                                Text="{Binding DealPrice}"
-                        />
-                        </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="2">
+                        <Label Style="{StaticResource lbl}" FontAttributes="Bold" Text="Price" TextColor="Black"/>
+                        <Entry
+                        Placeholder="Enter Total Amount"
+                        PlaceholderColor="Black"
+                        TextColor="Black"
+                        Style="{StaticResource txt}"
+                        Keyboard="Numeric"
+                        Text="{Binding Total}"
+                        IsReadOnly="True"
+                    />
                     </VerticalStackLayout>
-                    <Grid RowDefinitions="Auto,Auto" 
-                      ColumnDefinitions="*,*"
-                      RowSpacing="10"
-                      ColumnSpacing="10"
-                      Padding="15">
-                        <VerticalStackLayout Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
-                            <Label Text="Item Name" FontAttributes="Bold" TextColor="Black"/>
-                            <Entry Placeholder="Enter Item Name" 
-                                PlaceholderColor="Black"
-                                Style="{StaticResource txt}"
-                                TextColor="Black"
-                                Text="{Binding CurrentDeal.DealName}"/>
-                        </VerticalStackLayout>
+                </VerticalStackLayout>
 
-                        <VerticalStackLayout Grid.Row="1" Grid.Column="0">
-                            <Label Text="Item Price" FontAttributes="Bold" TextColor="Black"/>
-                            <Entry Placeholder="0.00" 
-                               PlaceholderColor="Black" 
-                               TextColor="Black"
-                               Style="{StaticResource txt}"
-                               Keyboard="Numeric"
-                               Text="{Binding CurrentDeal.UnitPrice}"/>
-                        </VerticalStackLayout>
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto" 
+              ColumnDefinitions="*,*"
+              RowSpacing="15"
+              ColumnSpacing="10"
+              Padding="15">
+                    <VerticalStackLayout Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                        <Label Text="Item Name" FontAttributes="Bold" TextColor="Black"/>
+                        <Entry Placeholder="Enter Item Name" 
+                        PlaceholderColor="Black"
+                        Style="{StaticResource txt}"
+                        TextColor="Black"
+                        Text="{Binding CurrentDeal.DealName}"/>
+                    </VerticalStackLayout>
 
-                        <VerticalStackLayout Grid.Row="1" Grid.Column="1">
-                            <Label Text="Item Quantity" FontAttributes="Bold" TextColor="Black"/>
-                            <Entry Placeholder="1" 
-                               PlaceholderColor="Black" 
-                               Style="{StaticResource txt}"
-                               TextColor="Black"
-                               Keyboard="Numeric"
-                               Text="{Binding CurrentDeal.Quantity}"/>
-                        </VerticalStackLayout>
-                    </Grid>
-                    <Button Text="Add to cart" 
+                    <VerticalStackLayout Grid.Row="1" Grid.Column="0">
+                        <Label Text="Item Price" FontAttributes="Bold" TextColor="Black"/>
+                        <Entry Placeholder="0.00" 
+                       PlaceholderColor="Black" 
+                       TextColor="Black"
+                       Style="{StaticResource txt}"
+                       Keyboard="Numeric"
+                       Text="{Binding CurrentDeal.UnitPrice}"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Row="1" Grid.Column="1">
+                        <Label Text="Item Quantity" FontAttributes="Bold" TextColor="Black"/>
+                        <Entry Placeholder="1" 
+                       PlaceholderColor="Black" 
+                       Style="{StaticResource txt}"
+                       TextColor="Black"
+                       Keyboard="Numeric"
+                       Text="{Binding CurrentDeal.Quantity}"/>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="2" Grid.Column="0">
+                        <Button Text="Add to cart" 
                         BackgroundColor="#753F21" 
                         TextColor="White" 
                         CornerRadius="10" 
+                        Grid.Column="1"
                         Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.AddDealItemCommand}"
                         CommandParameter="{Binding .}"/>
-                    <Grid Grid.Row="1" ColumnDefinitions="*,*,*,Auto" BackgroundColor="#A67B5B" Padding="10" Margin="0,20,0,0">
-                        <Label Text="Item Name" Grid.Column="0" TextColor="White" FontAttributes="Bold" FontSize="16" />
-                        <Label Text="Item Price" Grid.Column="1" TextColor="White" FontAttributes="Bold" FontSize="16" />
-                        <Label Text="Quantity" Grid.Column="2" TextColor="White" FontAttributes="Bold" FontSize="16" />
-                        <Label Text="SubTotal" Grid.Column="3" TextColor="White" FontAttributes="Bold" FontSize="16" />
-                    </Grid>
-                    <CollectionView Grid.Row="2" 
-                            x:Name="ProductListView"
-                       ItemsSource="{Binding DealItems}" 
-                      >         
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="data:DealItem">
-                                <Grid ColumnDefinitions="*,*,*,Auto" Padding="10" BackgroundColor="Transparent">
-                                    <Frame Grid.ColumnSpan="3" BackgroundColor="Transparent" BorderColor="#DDD0C8" Padding="0" Margin="0" HasShadow="False" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="2" Grid.Column="1">
+                        <Button Text="Save" 
+                        BackgroundColor="#753F21" 
+                        TextColor="White" 
+                        CornerRadius="10"
+                        Grid.Column="0"
+                        Command="{Binding SaveDealCommand}"
+                        CommandParameter="{Binding .}"/>
+                    </VerticalStackLayout>
+                </Grid>
+            </VerticalStackLayout>
 
+            <Grid Grid.Row="2" ColumnDefinitions="*,*,*,Auto" BackgroundColor="#A67B5B" Padding="10" Margin="0,15,0,0">
+                <Label Text="Item Name" Grid.Column="0" TextColor="White" FontAttributes="Bold" FontSize="16" />
+                <Label Text="Item Price" Grid.Column="1" TextColor="White" FontAttributes="Bold" FontSize="16" />
+                <Label Text="Quantity" Grid.Column="2" TextColor="White" FontAttributes="Bold" FontSize="16" />
+                <Label Text="SubTotal" Grid.Column="3" TextColor="White" FontAttributes="Bold" FontSize="16" />
+            </Grid>
 
-                                    <Entry Text="{Binding DealName}" Grid.Column="0" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
-
-
-                                    <Entry Text="{Binding UnitPrice}" Grid.Column="1" FontSize="16" Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" />
-
-                                    <Entry Text="{Binding Quantity}" Grid.Column="2" FontSize="16" Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" />
-
-                                    <Entry Text="{Binding SubTotal}" Grid.Column="3" FontSize="16" Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" />
-                                </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </VerticalStackLayout>
-            </ScrollView>
+         
+            <CollectionView 
+            Grid.Row="3" 
+            ItemsSource="{Binding DealItems}"
+            HeightRequest="300"
+            VerticalScrollBarVisibility="Always"
+        >
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="data:DealItem">
+                        <Grid ColumnDefinitions="*,*,*,Auto" Padding="10" BackgroundColor="Transparent">
+                            <Frame Grid.ColumnSpan="4" BackgroundColor="Transparent" BorderColor="#DDD0C8" Padding="0" Margin="0" HasShadow="False" />
+                            <Entry Text="{Binding DealName}" Grid.Column="0" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
+                            <Entry Text="{Binding UnitPrice}" Grid.Column="1" FontSize="16" Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" />
+                            <Entry Text="{Binding Quantity}" Grid.Column="2" FontSize="16" Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" />
+                            <Entry Text="{Binding SubTotal}" Grid.Column="3" FontSize="16" Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </Grid>
         <Grid Grid.Column="1" Margin="20"  RowDefinitions="Auto, Auto, *" RowSpacing="10">
+            <Grid Grid.Row="1" ColumnDefinitions="*,*,Auto" BackgroundColor="#A67B5B" Padding="10" Margin="0,20,0,0">
+                <Label Text="Deal Name" Grid.Column="0" TextColor="White" FontAttributes="Bold" FontSize="16" />
+                <Label Text="Price (Rs)" Grid.Column="1" TextColor="White" FontAttributes="Bold" FontSize="16" />
+                <Label Text="Actions" Grid.Column="2" TextColor="White" FontAttributes="Bold" FontSize="16" />
+            </Grid>
+            <CollectionView Grid.Row="2" 
+                                
+                       ItemsSource="{Binding Deals}" 
+                      >
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="data:Deal">
+                        <Grid ColumnDefinitions="*,*,Auto" Padding="10" BackgroundColor="Transparent">
+                            <Frame Grid.ColumnSpan="3" BackgroundColor="Transparent" BorderColor="#DDD0C8" Padding="0" Margin="0" HasShadow="False" />
+
+
+                            <Entry Text="{Binding DealName}" Grid.Column="0" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
+
+
+                            <Entry Text="{Binding DealAmount}" Grid.Column="1" FontSize="16" Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" />
+                            <HorizontalStackLayout Grid.Column="2" Spacing="5" HorizontalOptions="End">
+                                <Button
+                                    Text="Update"
+                                    BackgroundColor="Green"
+                                    TextColor="White"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UpdateDealCommand}"
+                                    CommandParameter="{Binding .}" />
+
+                                <Button
+                                    Text="Del"
+                                    BackgroundColor="Red"
+                                    TextColor="White"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteDealCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </Grid>
     </Grid>
 </ContentPage>
