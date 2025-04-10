@@ -94,6 +94,11 @@ public class DB_Services : IAsyncDisposable
         return await _database.Table<ProductItem>().Where(x => x.CategoryId == categoryId).ToListAsync();
     }
 
+    public async Task<List<Deal>> GetDealByCategory(int categoryId)
+    {
+        return await _database.Table<Deal>().Where(x => x.CategoryId == categoryId).ToListAsync();
+    }
+
     public async Task<List<ProductItem>> GetProductAndCategoryById(int menuId)
     {
         var query = @"SELECT p.*, c.Name AS CategoryName

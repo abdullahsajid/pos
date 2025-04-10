@@ -20,6 +20,9 @@ namespace pos.ViewModels
         public ObservableCollection<ProductModel> _products = new();
 
         [ObservableProperty]
+        public ObservableCollection<Deal> _deals= new();
+
+        [ObservableProperty]
         private bool _isLoading;
 
         [ObservableProperty]
@@ -33,6 +36,11 @@ namespace pos.ViewModels
 
         [ObservableProperty]
         private decimal _total;
+
+        [ObservableProperty]
+        private bool hasProducts;
+        [ObservableProperty]
+        private bool hasDeals;
 
         public HomeViewModel(DB_Services dbServices)
         {
@@ -129,30 +137,81 @@ namespace pos.ViewModels
         {
             try
             {
+                Products.Clear();
+                Deals.Clear();
                 if (SelectedCategory == null)
                 {
-                    Products.Clear();
+                    HasProducts = false;
+                    HasDeals = false;
                     return;
                 }
+                Console.WriteLine($"Selected Category: {SelectedCategory.Name}, ID: {SelectedCategory.Id}");
                 var productList = await _dbServices.GetProductsByCategory(SelectedCategory.Id);
-                
-                if (productList != null)
+                Console.WriteLine($"Products fetched: {productList?.Count ?? 0}");
+                if (SelectedCategory.Name == "Deals")
                 {
-                    Products.Clear();
-                    foreach (var product in productList)
+                    var dealList = await _dbServices.GetDealByCategory(SelectedCategory.Id);
+                    Debug.WriteLine($"Deals fetched: {dealList?.Count ?? 0} {dealList?.Count}");
+                    //foreach (var deal in dealList)
+                    //{
+                    //    Deals.Add(deal); 
+                    //}
+                    if (dealList != null && dealList.Any())
                     {
-                        Products.Add(new ProductModel
+                        Debug.WriteLine("Populating Deals...");
+                        foreach (var deal in dealList)
                         {
-                            Id = product.Id,
-                            Name = product.Name,
-                            Price = product.Price
-                        });
+                            if (deal == null)
+                            {
+                                Debug.WriteLine("Found null deal in dealList, skipping...");
+                                continue;
+                            }
+
+                            try
+                            {
+                                Deals.Add(new Deal
+                                {
+                                    DealName = deal.DealName ?? "Unnamed Deal", // Fallback for null
+                                    OrderDate = deal.OrderDate, // Ensure this property exists
+                                    DealAmount = deal.DealAmount // Ensure this property exists
+                                });
+                                Debug.WriteLine($"Added deal: {deal.DealName}, {deal.DealAmount}");
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine($"Error adding deal: {ex.Message}");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("dealList is null or empty");
+                    }
+                    //return;
+                }
+                else
+                {
+                    if(productList != null)
+                    {
+                        foreach (var product in productList)
+                        {
+                            Products.Add(new ProductModel
+                            {
+                                Id = product.Id,
+                                Name = product.Name,
+                                Price = product.Price
+                            });
+                        }
                     }
                 }
+                HasProducts = Products.Count > 0;
+                HasDeals = Deals.Count > 0;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
+                HasProducts = false;
+                HasDeals = false;
             }
         }
 

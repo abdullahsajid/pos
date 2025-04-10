@@ -17,6 +17,8 @@ namespace pos.Data
 
         public decimal DealAmount { get; set; }
 
+        public int CategoryId { get; set; }
+
         [Ignore]
         public List<DealItem> DealItems { get; set; } = new List<DealItem>();
     }

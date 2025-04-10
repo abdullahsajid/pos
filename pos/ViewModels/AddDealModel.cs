@@ -175,6 +175,7 @@ namespace pos.ViewModels
         {
             try
             {
+                var ProductCategory = AddProductCategory.FirstOrDefault(c => c.IsSelected);
                 if (string.IsNullOrEmpty(DealName) || Total <= 0 || DealItems == null || DealItems.Count == 0)
                 {
                     await Shell.Current.DisplayAlert("Error", "Please fill all fields", "OK");
@@ -184,7 +185,8 @@ namespace pos.ViewModels
                 {
                     DealName = DealName,
                     OrderDate = DateTime.Now,
-                    DealAmount = Total
+                    DealAmount = Total,
+                    CategoryId = ProductCategory.Id
                 };
                 await _dbServices.AddDeal(deal);
 
@@ -204,6 +206,7 @@ namespace pos.ViewModels
                 DealName = string.Empty;
                 Total = 0;
                 DealItems.Clear();
+                await GetDeals();
             }
             catch(Exception ex)
             {
