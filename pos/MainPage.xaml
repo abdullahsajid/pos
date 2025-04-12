@@ -208,50 +208,6 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-                <CollectionView Grid.Row="1" ItemsSource="{Binding Deals}" IsVisible="{Binding HasDeals}" VerticalOptions="Center">
-                    <CollectionView.ItemsLayout>
-                        <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="data:Deal">
-                            <Border Padding="20,10"
-                                StrokeThickness="1"
-                                StrokeShape="RoundRectangle 10"
-                                >
-                                <VerticalStackLayout Spacing="5">
-                                    <Label Text="{Binding DealName}" TextColor="black" FontSize="18"/>
-                                    <Label Text="{Binding DealAmount}" FontSize="24" TextColor="black"/>
-                                    <Button Text="Add to cart" 
-                                        BackgroundColor="#753F21" 
-                                        TextColor="White" 
-                                        CornerRadius="10" 
-                                        Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.AddToCartCommand}"
-                                        CommandParameter="{Binding .}"/>        
-                                </VerticalStackLayout>
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer 
-                                        Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.AddToCartCommand}"
-                                        CommandParameter="{Binding .}"/>
-                                </Border.GestureRecognizers>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-                <BoxView
-                    HorizontalOptions="Fill"
-                    IsVisible="{Binding IsLoading}"
-                    Opacity="0.3"
-                    VerticalOptions="Fill"
-                    Color="#753F21" />
-
-                <ActivityIndicator
-                    HeightRequest="25"
-                    HorizontalOptions="Center"
-                    IsRunning="{Binding IsLoading}"
-                    VerticalOptions="Center"
-                    WidthRequest="25"
-                    Color="Maroon" />
-
             </Grid>
         </Grid>
     </Grid>

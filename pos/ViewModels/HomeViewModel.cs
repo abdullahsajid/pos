@@ -145,9 +145,9 @@ namespace pos.ViewModels
                     HasDeals = false;
                     return;
                 }
-                Console.WriteLine($"Selected Category: {SelectedCategory.Name}, ID: {SelectedCategory.Id}");
+                Debug.WriteLine($"Selected Category: {SelectedCategory.Name}, ID: {SelectedCategory.Id}");
                 var productList = await _dbServices.GetProductsByCategory(SelectedCategory.Id);
-                Console.WriteLine($"Products fetched: {productList?.Count ?? 0}");
+                Debug.WriteLine($"Products fetched: {productList?.Count ?? 0}");
                 if (SelectedCategory.Name == "Deals")
                 {
                     var dealList = await _dbServices.GetDealByCategory(SelectedCategory.Id);
@@ -171,9 +171,9 @@ namespace pos.ViewModels
                             {
                                 Deals.Add(new Deal
                                 {
-                                    DealName = deal.DealName ?? "Unnamed Deal", // Fallback for null
-                                    OrderDate = deal.OrderDate, // Ensure this property exists
-                                    DealAmount = deal.DealAmount // Ensure this property exists
+                                    DealName = deal.DealName ?? "Unnamed Deal",
+                                    OrderDate = deal.OrderDate, 
+                                    DealAmount = deal.DealAmount
                                 });
                                 Debug.WriteLine($"Added deal: {deal.DealName}, {deal.DealAmount}");
                             }
