@@ -102,6 +102,7 @@ namespace pos.ViewModels
             await GetCategory();
             //IsLoading = true;
             await GetProducts();
+            await GetDeals();
             //IsLoading = false;
         }
 
@@ -148,49 +149,49 @@ namespace pos.ViewModels
                 Debug.WriteLine($"Selected Category: {SelectedCategory.Name}, ID: {SelectedCategory.Id}");
                 var productList = await _dbServices.GetProductsByCategory(SelectedCategory.Id);
                 Debug.WriteLine($"Products fetched: {productList?.Count ?? 0}");
-                if (SelectedCategory.Name == "Deals")
-                {
-                    var dealList = await _dbServices.GetDealByCategory(SelectedCategory.Id);
-                    Debug.WriteLine($"Deals fetched: {dealList?.Count ?? 0} {dealList?.Count}");
-                    //foreach (var deal in dealList)
-                    //{
-                    //    Deals.Add(deal); 
-                    //}
-                    if (dealList != null && dealList.Any())
-                    {
-                        Debug.WriteLine("Populating Deals...");
-                        foreach (var deal in dealList)
-                        {
-                            if (deal == null)
-                            {
-                                Debug.WriteLine("Found null deal in dealList, skipping...");
-                                continue;
-                            }
+                //if (SelectedCategory.Name == "Deals")
+                //{
+                //    var dealList = await _dbServices.GetDealByCategory(SelectedCategory.Id);
+                //    Debug.WriteLine($"Deals fetched: {dealList?.Count ?? 0} {dealList?.Count}");
+                //    //foreach (var deal in dealList)
+                //    //{
+                //    //    Deals.Add(deal); 
+                //    //}
+                //    if (dealList != null && dealList.Any())
+                //    {
+                //        Debug.WriteLine("Populating Deals...");
+                //        foreach (var deal in dealList)
+                //        {
+                //            if (deal == null)
+                //            {
+                //                Debug.WriteLine("Found null deal in dealList, skipping...");
+                //                continue;
+                //            }
 
-                            try
-                            {
-                                Deals.Add(new Deal
-                                {
-                                    DealName = deal.DealName ?? "Unnamed Deal",
-                                    OrderDate = deal.OrderDate, 
-                                    DealAmount = deal.DealAmount
-                                });
-                                Debug.WriteLine($"Added deal: {deal.DealName}, {deal.DealAmount}");
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine($"Error adding deal: {ex.Message}");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Debug.WriteLine("dealList is null or empty");
-                    }
-                    //return;
-                }
-                else
-                {
+                //            try
+                //            {
+                //                Deals.Add(new Deal
+                //                {
+                //                    DealName = deal.DealName ?? "Unnamed Deal",
+                //                    OrderDate = deal.OrderDate, 
+                //                    DealAmount = deal.DealAmount
+                //                });
+                //                Debug.WriteLine($"Added deal: {deal.DealName}, {deal.DealAmount}");
+                //            }
+                //            catch (Exception ex)
+                //            {
+                //                Debug.WriteLine($"Error adding deal: {ex.Message}");
+                //            }
+                //        }
+                //    }
+                //    else
+                //    {
+                //        Debug.WriteLine("dealList is null or empty");
+                //    }
+                //    //return;
+                //}
+                //else
+                //{
                     if(productList != null)
                     {
                         foreach (var product in productList)
@@ -203,15 +204,46 @@ namespace pos.ViewModels
                             });
                         }
                     }
-                }
+                //}
                 HasProducts = Products.Count > 0;
-                HasDeals = Deals.Count > 0;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
                 HasProducts = false;
                 HasDeals = false;
+            }
+        }
+
+        public async Task GetDeals()
+        {
+            try
+            {
+                Deals.Clear();
+                if (SelectedCategory == null)
+                {
+                    HasDeals = false;
+                    return;
+                }
+                var dealList = await _dbServices.GetDealByCategory(SelectedCategory.Id);
+                if (dealList != null)
+                {
+                    foreach (var deal in dealList)
+                    {
+                        Deals.Add(new Deal
+                        {
+                            DealName = deal.DealName,
+                            OrderDate = deal.OrderDate,
+                            DealAmount = deal.DealAmount
+                        });
+                        Debug.WriteLine($"Added deal: {deal.DealName}, {deal.DealAmount}");
+                    }
+                }
+                HasDeals = Deals.Count > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
             }
         }
 

@@ -208,6 +208,24 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
+                <CollectionView Grid.Row="1"  ItemsSource="{Binding Deals}" IsVisible="{Binding HasDeals}" VerticalOptions="Center">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="data:Deal">
+                            <Border Padding="20,10"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 10"
+                    >
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="{Binding DealName}" TextColor="black" FontSize="18"/>
+                                    <Label Text="{Binding DealAmount}" FontSize="24" TextColor="black"/>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
             </Grid>
         </Grid>
     </Grid>
