@@ -32,6 +32,13 @@
     />
 
     <ShellContent
+        Title="Deal Cart"
+        ContentTemplate="{DataTemplate pages:DealCartPage}"
+        Icon="home.png"
+        Route="DealCartPage"
+    />
+
+    <ShellContent
         Title="Deals"
         ContentTemplate="{DataTemplate pages:AddDealPage}"
         Icon="grid.png"

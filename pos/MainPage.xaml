@@ -2,7 +2,10 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="pos.MainPage"
-             Shell.NavBarIsVisible="False"
+             Title="Items Cart"
+             Shell.NavBarIsVisible="True"
+             Shell.BackgroundColor="#FFF3EA"
+             Shell.TitleColor="#753F21"
              BackgroundColor="#FFF3EA"
              xmlns:data="clr-namespace:pos.Data"
              xmlns:models="clr-namespace:pos.Models"
@@ -215,13 +218,18 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="data:Deal">
                             <Border Padding="20,10"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 10"
-                    >
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 10"
+                                >
                                 <VerticalStackLayout Spacing="5">
                                     <Label Text="{Binding DealName}" TextColor="black" FontSize="18"/>
                                     <Label Text="{Binding DealAmount}" FontSize="24" TextColor="black"/>
                                 </VerticalStackLayout>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer 
+                                        Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.AddToCartCommand}"
+                                        CommandParameter="{Binding .}"/>            
+                                </Border.GestureRecognizers>
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

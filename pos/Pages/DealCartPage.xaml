@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="pos.Pages.DealCartPage"
+             Title="Deal Cart"
+             Shell.NavBarIsVisible="True"
+             Shell.BackgroundColor="#FFF3EA"
+             Shell.TitleColor="#753F21"
+             BackgroundColor="#FFF3EA"
+             >
+    <Grid ColumnDefinitions=".40*, .60*">
+        <Grid Grid.Column="0" Margin="20" RowDefinitions="Auto, *, Auto" BackgroundColor="White">
+            <VerticalStackLayout Grid.Row="0" Spacing="0">
+                <Grid Padding="8" BackgroundColor="#753F21">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="80" />
+                        <ColumnDefinition Width="100" />
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Text="Name" TextColor="White" FontAttributes="Bold" Padding="10" />
+                    <Label Grid.Column="1" Text="Qty" TextColor="White" FontAttributes="Bold" Padding="10" />
+                    <Label Grid.Column="2" Text="Price" TextColor="White" FontAttributes="Bold" Padding="10" />
+                    <Label Grid.Column="3" Text="Total" TextColor="White" FontAttributes="Bold" Padding="10" />
+                </Grid>
+                <BoxView HeightRequest="1" BackgroundColor="#E0E0E0" VerticalOptions="End" />
+            </VerticalStackLayout>
+            <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Always">
+                <CollectionView  
+                   VerticalOptions="Fill"
+                   HorizontalOptions="Fill">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:CartModel">
+                            <Grid Padding="20" RowSpacing="0" ColumnSpacing="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150" />
+                                    <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="80" />
+                                    <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="100" />
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0" Text="Name" TextColor="Black" Padding="10" />
+                                <Entry 
+                                    Grid.Column="1"
+                                    Text="1"
+                                    TextColor="Black"
+                                    Keyboard="Numeric"
+                                    HorizontalTextAlignment="Center"
+                                    WidthRequest="60"
+                                />
+                                <Label Grid.Column="2" Text="100" Padding="10" TextColor="Black" HorizontalTextAlignment="Center" />
+                                <Label Grid.Column="3" Text="100" Padding="10" TextColor="Black" HorizontalTextAlignment="End" />
+                                <ImageButton
+                                    Source="cross.png"
+                                    Grid.Column="4"
+                                    
+                                    ToolTipProperties.Text="Remove item from cart"
+                                    HorizontalOptions="End"
+                                    VerticalOptions="Start"
+                                    HeightRequest="10"
+                                    WidthRequest="10"
+                                />
+                                <BoxView Grid.ColumnSpan="5" HeightRequest="1" BackgroundColor="#E0E0E0" VerticalOptions="End" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </ScrollView>
+            <VerticalStackLayout Grid.Row="2">
+                <Border Padding="5, 10" Margin="10" StrokeShape="RoundRectangle 10">
+                    <Grid RowDefinitions="Auto, Auto, Auto, Auto"
+                            ColumnDefinitions="2*, 3*">
+                        <Label 
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Text="Payment" 
+                            FontSize="22"
+                            TextColor="Black" 
+                        />
+                        <Entry
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            FontSize="22"
+                            Text="10"
+                            Keyboard="Numeric"
+                            HorizontalTextAlignment="Center"
+                            TextColor="Black"
+                        />
+                        <Label 
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Text="Change" 
+                            FontSize="22"
+                            TextColor="Black" 
+                        />
+                        <Label 
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            FontSize="22"
+                            Text="10" 
+                            TextColor="Black" 
+                            HorizontalTextAlignment="Center"
+                        />
+                        <Label 
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Text="Total" 
+                            FontSize="23"
+                            TextColor="Black"
+                            FontAttributes="Bold"
+                        />
+                        <Label 
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            FontSize="23"
+                            Text="12" 
+                            TextColor="Black" 
+                            HorizontalTextAlignment="Center"
+                            FontAttributes="Bold"
+                        />
+                        <Button 
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Margin="10"
+                            Text="Print" 
+                            BackgroundColor="Green" 
+                            TextColor="White" 
+                            CornerRadius="10" 
+                            
+                        />
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </Grid>
+        <Grid Grid.Column="1" RowDefinitions="Auto, Auto, *" RowSpacing="10">
+            <CollectionView Grid.Row="1" x:Name="CategoryListView" HorizontalOptions="Center" HorizontalScrollBarVisibility="Default">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout ItemSpacing="10" Orientation="Horizontal"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Padding="20,10"
+                        StrokeThickness="2"
+                        StrokeShape="RoundRectangle 10"
+                        BackgroundColor="#FFF3EA"
+                        Stroke="White"
+                        >
+                            <HorizontalStackLayout Spacing="5">
+                                <Label Text="Name" TextColor="#753F21">
+                                    <Label.Triggers>
+                                        <DataTrigger
+                                    
+                                    TargetType="Label"
+                                    Value="True"
+                                >
+                                            <Setter Property="TextColor" Value="White"/>
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </HorizontalStackLayout>
+                            <Border.Triggers>
+                                <DataTrigger
+                            
+                            TargetType="Border"
+                            Value="True"
+                        >
+                                    <Setter Property="BackgroundColor" Value="#753F21"/>
+                                </DataTrigger>
+                            </Border.Triggers>
+                            
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <Grid Grid.Row="2" RowDefinitions="Auto, Auto, Auto">
+                <CollectionView Grid.Row="0" x:Name="ProductListView" VerticalOptions="Center">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="20,10"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 10"
+                            >
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="name" TextColor="black" FontSize="18"/>
+                                    <Label Text="10" FontSize="24" TextColor="black"/>
+                                    <Button Text="Add to cart" 
+                                BackgroundColor="#753F21" 
+                                TextColor="White" 
+                                CornerRadius="10" 
+                                />
+                                </VerticalStackLayout>
+                                
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                <CollectionView Grid.Row="1"  VerticalOptions="Center">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="20,10"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 10"
+                        >
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="name" TextColor="black" FontSize="18"/>
+                                    <Label Text="100" FontSize="24" TextColor="black"/>
+                                </VerticalStackLayout>
+                          
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentPage>

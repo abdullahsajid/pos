@@ -264,36 +264,66 @@ namespace pos.ViewModels
             SelectedCategory = newCategory;
 
             await GetProducts();
+            await GetDeals();
 
         }
 
         [RelayCommand]
-        public void AddToCart(ProductModel menuItem)
+        private void AddToCart(object item)
         {
             try
             {
-                var cartitem = CartItems.FirstOrDefault(c => c.itemId == menuItem.Id);
-                if (cartitem == null)
+                CartModel cartitem = null;
+
+                if (item is ProductModel product)
                 {
-                    cartitem = new CartModel
+                    cartitem = CartItems.FirstOrDefault(c => c.itemId == product.Id);
+                    if (cartitem == null)
                     {
-                        itemId = menuItem.Id,
-                        Name = menuItem.Name,
-                        Price = menuItem.Price,
-                        Quantity = 1
-                    };
-                    CartItems.Add(cartitem);
-                    UpdateTotal();
+                        cartitem = new CartModel
+                        {
+                            itemId = product.Id,
+                            Name = product.Name,
+                            Price = product.Price,
+                            Quantity = 1
+                        };
+                        CartItems.Add(cartitem);
+                    }
+                    else
+                    {
+                        cartitem.Quantity++;
+                    }
+                }
+                else if (item is Deal deal)
+                {
+                    cartitem = CartItems.FirstOrDefault(c => c.itemId == deal.Id);
+                    if (cartitem == null)
+                    {
+                        cartitem = new CartModel
+                        {
+                            itemId = (int)deal.Id,
+                            Name = deal.DealName,
+                            Price = deal.DealAmount,
+                            Quantity = 1
+                        };
+                        CartItems.Add(cartitem);
+                    }
+                    else
+                    {
+                        cartitem.Quantity++;
+                    }
                 }
                 else
                 {
-                    cartitem.Quantity++;
-                    UpdateTotal();
+                    Debug.WriteLine("Error: Unknown item type passed to AddToCart");
+                    return;
                 }
+
+                UpdateTotal();
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Error: " + e.Message);
+                Debug.WriteLine($"Error in AddToCart: {e.Message}");
             }
         }
 
@@ -308,6 +338,7 @@ namespace pos.ViewModels
             CartItems.Remove(cartItem);
             UpdateTotal();
         }
+
         [RelayCommand]
         public async void PrintInvoice()
         {
