@@ -54,16 +54,16 @@
                                 <Label Grid.Column="2" Text="{Binding Price, StringFormat='{0:C}'}" Padding="10" TextColor="Black" HorizontalTextAlignment="Center" />
                                 <Label Grid.Column="3" Text="{Binding Total, StringFormat='{0:C}'}" Padding="10" TextColor="Black" HorizontalTextAlignment="End" />
                                 <ImageButton
-                            Source="cross.png"
-                            Grid.Column="4"
-                            Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.RemoveFromCartCommand}"
-                            CommandParameter="{Binding .}"
-                            ToolTipProperties.Text="Remove item from cart"
-                            HorizontalOptions="End"
-                            VerticalOptions="Start"
-                            HeightRequest="10"
-                            WidthRequest="10"
-                        />
+                                    Source="cross.png"
+                                    Grid.Column="4"
+                                    Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.RemoveFromCartCommand}"
+                                    CommandParameter="{Binding .}"
+                                    ToolTipProperties.Text="Remove item from cart"
+                                    HorizontalOptions="End"
+                                    VerticalOptions="Start"
+                                    HeightRequest="10"
+                                    WidthRequest="10"
+                                />
                                 <BoxView Grid.ColumnSpan="5" HeightRequest="1" BackgroundColor="#E0E0E0" VerticalOptions="End" />
                             </Grid>
                         </DataTemplate>
@@ -73,46 +73,46 @@
             <VerticalStackLayout Grid.Row="2">
                 <Border Padding="5, 10" Margin="10" StrokeShape="RoundRectangle 10">
                     <Grid RowDefinitions="Auto, Auto, Auto, Auto"
-                  ColumnDefinitions="2*, 3*">
+                        ColumnDefinitions="2*, 3*">
                         <Label 
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Text="Payment" 
-                    FontSize="22"
-                    TextColor="Black" 
-                />
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Text="Payment" 
+                            FontSize="22"
+                            TextColor="Black" 
+                        />
                         <Entry
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    FontSize="22"
-                    Text="{Binding Payment, Mode=TwoWay}"
-                    Keyboard="Numeric"
-                    HorizontalTextAlignment="Center"
-                    TextColor="Black"
-                />
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            FontSize="22"
+                            Text="{Binding Payment, Mode=TwoWay}"
+                            Keyboard="Numeric"
+                            HorizontalTextAlignment="Center"
+                            TextColor="Black"
+                        />
                         <Label 
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Text="Change" 
-                    FontSize="22"
-                    TextColor="Black" 
-                />
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Text="Change" 
+                            FontSize="22"
+                            TextColor="Black" 
+                        />
                         <Label 
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    FontSize="22"
-                    Text="{Binding Change}" 
-                    TextColor="Black" 
-                    HorizontalTextAlignment="Center"
-                />
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            FontSize="22"
+                            Text="{Binding Change}" 
+                            TextColor="Black" 
+                            HorizontalTextAlignment="Center"
+                        />
                         <Label 
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    Text="Total" 
-                    FontSize="23"
-                    TextColor="Black"
-                    FontAttributes="Bold"
-                />
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Text="Total" 
+                            FontSize="23"
+                            TextColor="Black"
+                            FontAttributes="Bold"
+                        />
                         <Label 
                             Grid.Row="2"
                             Grid.Column="1"
