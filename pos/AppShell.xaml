@@ -20,7 +20,7 @@
     <ShellContent
         Title="Product"
         ContentTemplate="{DataTemplate pages:AddProductPage}"
-        Icon="grid.png"
+        Icon="add_items.png"
         Route="AddProductPage" 
     />
 
@@ -34,7 +34,7 @@
     <ShellContent
         Title="Deal Cart"
         ContentTemplate="{DataTemplate pages:DealCartPage}"
-        Icon="home.png"
+        Icon="add_to_cart.png"
         Route="DealCartPage"
     />
 
@@ -43,6 +43,6 @@
         ContentTemplate="{DataTemplate pages:AddDealPage}"
         Icon="grid.png"
         Route="AddDealPage"
-        />
+     />
 
 </Shell>

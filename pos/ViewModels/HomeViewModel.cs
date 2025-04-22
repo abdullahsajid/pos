@@ -102,8 +102,6 @@ namespace pos.ViewModels
             await GetCategory();
             //IsLoading = true;
             await GetProducts();
-            await GetDeals();
-            //IsLoading = false;
         }
 
         public async Task GetCategory()
@@ -215,38 +213,6 @@ namespace pos.ViewModels
             }
         }
 
-        public async Task GetDeals()
-        {
-            try
-            {
-                Deals.Clear();
-                if (SelectedCategory == null)
-                {
-                    HasDeals = false;
-                    return;
-                }
-                var dealList = await _dbServices.GetDealByCategory(SelectedCategory.Id);
-                if (dealList != null)
-                {
-                    foreach (var deal in dealList)
-                    {
-                        Deals.Add(new Deal
-                        {
-                            DealName = deal.DealName,
-                            OrderDate = deal.OrderDate,
-                            DealAmount = deal.DealAmount
-                        });
-                        Debug.WriteLine($"Added deal: {deal.DealName}, {deal.DealAmount}");
-                    }
-                }
-                HasDeals = Deals.Count > 0;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-        }
-
         [RelayCommand]
         private async Task SelectCategoryAsync(CategoryModel category)
         {
@@ -264,12 +230,11 @@ namespace pos.ViewModels
             SelectedCategory = newCategory;
 
             await GetProducts();
-            await GetDeals();
 
         }
 
         [RelayCommand]
-        private void AddToCart(object item)
+        private void AddToCart(ProductModel item)
         {
             try
             {
@@ -294,31 +259,6 @@ namespace pos.ViewModels
                         cartitem.Quantity++;
                     }
                 }
-                else if (item is Deal deal)
-                {
-                    cartitem = CartItems.FirstOrDefault(c => c.itemId == deal.Id);
-                    if (cartitem == null)
-                    {
-                        cartitem = new CartModel
-                        {
-                            itemId = (int)deal.Id,
-                            Name = deal.DealName,
-                            Price = deal.DealAmount,
-                            Quantity = 1
-                        };
-                        CartItems.Add(cartitem);
-                    }
-                    else
-                    {
-                        cartitem.Quantity++;
-                    }
-                }
-                else
-                {
-                    Debug.WriteLine("Error: Unknown item type passed to AddToCart");
-                    return;
-                }
-
                 UpdateTotal();
             }
             catch (Exception e)

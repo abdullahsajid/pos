@@ -220,11 +220,24 @@ namespace pos.ViewModels
 
         }
 
-        //public async Task GetProduct()
-        //{
-        //    var products = await _dbServices.GetProducts();
-        //    Products = new ObservableCollection<ProductItem>(products);
-        //}
+        [RelayCommand]
+        public async void DeleteProducts(ProductItem item)
+        {
+            try
+            {
+                var result = await _dbServices.DeleteProductById(item);
+                Debug.WriteLine("Result: " + result);
+                if (result > 0)
+                {
+                    await GetProducts();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error: " + ex.Message);
+                await Shell.Current.DisplayAlert("Error", "Something went wrong!", "OK");
+            }
+        }
 
     }
 }

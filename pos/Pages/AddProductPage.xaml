@@ -31,38 +31,6 @@
         <Grid Grid.Column="0" Margin="20" Padding="10" RowDefinitions="Auto, *, Auto" BackgroundColor="White">
             <ScrollView>
                 <VerticalStackLayout Spacing="10">
-                    <VerticalStackLayout Spacing="2">
-                        <Label Style="{StaticResource lbl}" FontAttributes="Bold" Text="Name" TextColor="Black"/>
-                        <Entry
-                            Placeholder="Enter Name"
-                            PlaceholderColor="Black"
-                            TextColor="Black"
-                            Style="{StaticResource txt}"
-                            Text="{Binding CurrentProduct.Name}"
-                        />
-                    </VerticalStackLayout>
-                    <VerticalStackLayout Spacing="2">
-                        <Label Style="{StaticResource lbl}" FontAttributes="Bold" Text="Price" TextColor="Black"/>
-                        <Entry
-                            Placeholder="Enter Price"
-                            PlaceholderColor="Black"
-                            TextColor="Black"
-                            Style="{StaticResource txt}"
-                            Keyboard="Numeric"
-                            Text="{Binding CurrentProduct.Price}"
-                        />
-                    </VerticalStackLayout>
-                    <VerticalStackLayout Spacing="2">
-                        <Label Text="Descrption" FontAttributes="Bold" Style="{StaticResource lbl}"/>
-                        <Editor
-                            MinimumHeightRequest="100"
-                            Placeholder="Enter Description"
-                            PlaceholderColor="Black"
-                            TextColor="Black"
-                            Style="{StaticResource txt}"
-                            Text="{Binding CurrentProduct.Description}"
-                        />
-                    </VerticalStackLayout>
                     <VerticalStackLayout>
                         <Label Text="Categories" Style="{StaticResource lbl}" FontAttributes="Bold"/>
                         <CollectionView ItemsSource="{Binding AddProductCategory}">
@@ -106,13 +74,45 @@
                                         </Border.Triggers>
                                         <Border.GestureRecognizers>
                                             <TapGestureRecognizer 
-                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ProductsCategoryCommand}"
-                                                    CommandParameter="{Binding .}"/>
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ProductsCategoryCommand}"
+                                                CommandParameter="{Binding .}"/>
                                         </Border.GestureRecognizers>
                                     </Border>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="2">
+                        <Label Style="{StaticResource lbl}" FontAttributes="Bold" Text="Name" TextColor="Black"/>
+                        <Entry
+                            Placeholder="Enter Name"
+                            PlaceholderColor="Black"
+                            TextColor="Black"
+                            Style="{StaticResource txt}"
+                            Text="{Binding CurrentProduct.Name}"
+                        />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="2">
+                        <Label Style="{StaticResource lbl}" FontAttributes="Bold" Text="Price" TextColor="Black"/>
+                        <Entry
+                            Placeholder="Enter Price"
+                            PlaceholderColor="Black"
+                            TextColor="Black"
+                            Style="{StaticResource txt}"
+                            Keyboard="Numeric"
+                            Text="{Binding CurrentProduct.Price}"
+                        />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Descrption" FontAttributes="Bold" Style="{StaticResource lbl}"/>
+                        <Editor
+                            MinimumHeightRequest="100"
+                            Placeholder="Enter Description"
+                            PlaceholderColor="Black"
+                            TextColor="Black"
+                            Style="{StaticResource txt}"
+                            Text="{Binding CurrentProduct.Description}"
+                        />
                     </VerticalStackLayout>
                     <Grid ColumnDefinitions="*,*">
                         <Button
@@ -146,6 +146,30 @@
                             x:Name="saveButton"
                             Clicked="saveCategory_Clicked"
                         />
+                    </Grid>
+                    <Grid RowSpacing="10">
+                        <CollectionView ItemsSource="{Binding Categories}">
+                            <CollectionView.ItemsLayout>
+                                <GridItemsLayout Orientation="Vertical" 
+                                    Span="3"
+                                    HorizontalItemSpacing="10" 
+                                    VerticalItemSpacing="10"/>  
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:CategoryModel">
+                                    <Border Padding="20,10"
+                                        StrokeThickness="2"
+                                        StrokeShape="RoundRectangle 10"
+                                        BackgroundColor="#FFF3EA"
+                                        Stroke="White">
+                                        <Entry Text="{Binding Name}" 
+                                            FontSize="16" 
+                                            BackgroundColor="Transparent" 
+                                            TextColor="Black" />
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
                     </Grid>
                 </VerticalStackLayout>
             </ScrollView>
@@ -195,7 +219,7 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
             <Grid Grid.Row="1" ColumnDefinitions="*,*,Auto" BackgroundColor="#A67B5B" Padding="10" Margin="0,20,0,0">
-                    <Label Text="Cake Name" Grid.Column="0" TextColor="White" FontAttributes="Bold" FontSize="16" />
+                    <Label Text="Name" Grid.Column="0" TextColor="White" FontAttributes="Bold" FontSize="16" />
                     <Label Text="Price (Rs)" Grid.Column="1" TextColor="White" FontAttributes="Bold" FontSize="16" />
                     <Label Text="Actions" Grid.Column="2" TextColor="White" FontAttributes="Bold" FontSize="16" />
             </Grid>
@@ -213,7 +237,7 @@
 
 
                             <Entry Text="{Binding Price}" Grid.Column="1" FontSize="16" Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" />
-                            <Grid Grid.Column="2" ColumnDefinitions="Auto, Auto" HorizontalOptions="End">
+                            <HorizontalStackLayout Grid.Column="2" Spacing="5" HorizontalOptions="End">
                                 <Button
                                     Text="Update"
                                     BackgroundColor="Green"
@@ -221,7 +245,13 @@
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UpdateItemCommand}"
                                     CommandParameter="{Binding .}"
                                 />
-                            </Grid>
+                                <Button
+                                    Text="Del"
+                                    BackgroundColor="Red"
+                                    TextColor="White"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteProductsCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </HorizontalStackLayout>
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

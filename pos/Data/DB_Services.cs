@@ -132,6 +132,21 @@ public class DB_Services : IAsyncDisposable
         return await _database.UpdateAsync(deals);
     }
 
+    public async Task<int> DeleteProductById(ProductItem item)
+    {
+        var products = await _database.Table<ProductItem>().Where(x => x.Id == item.Id).FirstOrDefaultAsync();
+        if (products == null)
+        {
+            return 0;
+        }
+        var deleted = await _database.DeleteAsync(products);
+        if (deleted == 0)
+        {
+            return 0;
+        }
+        return deleted;
+    }
+
     public async Task<int> DeleteDealById(Deal deal)
     {
         var deals = await _database.Table<Deal>().Where(x => x.Id == deal.Id).FirstOrDefaultAsync();
