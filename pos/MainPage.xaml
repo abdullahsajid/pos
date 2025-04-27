@@ -172,7 +172,7 @@
                 </Border>
             </VerticalStackLayout>
         </Grid>
-        <Grid Grid.Column="1" RowDefinitions="Auto, Auto, *" RowSpacing="10">
+        <Grid Grid.Column="1" RowDefinitions="Auto, Auto, Auto, *" RowSpacing="10">
             <CollectionView Grid.Row="1" x:Name="CategoryListView" ItemsSource="{Binding Categories}" HorizontalOptions="Center" HorizontalScrollBarVisibility="Default">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout ItemSpacing="10" Orientation="Horizontal"/>
@@ -216,7 +216,17 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-            <Grid Grid.Row="2" RowDefinitions="Auto, Auto, Auto">
+            <SearchBar 
+                Grid.Row="2"
+                Placeholder="Search items..." 
+                TextChanged="OnSearchProductItems"
+                CancelButtonColor="Gray"
+                PlaceholderColor="Gray"
+                TextColor="Black"
+                Margin="0,0,0,10" 
+                BackgroundColor="#FFF"
+            />
+            <Grid Grid.Row="3" RowDefinitions="Auto, Auto, Auto">
                 <CollectionView Grid.Row="0" x:Name="ProductListView" ItemsSource="{Binding Products}" IsVisible="{Binding HasProducts}" VerticalOptions="Center">
                     <CollectionView.ItemsLayout>
                         <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="10" VerticalItemSpacing="10"/>

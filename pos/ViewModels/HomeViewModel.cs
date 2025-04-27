@@ -45,8 +45,11 @@ namespace pos.ViewModels
         [ObservableProperty]
         private bool hasDeals;
 
+        private string _productSearch;
+
         private string _searchText;
         private bool _isSearchActive;
+     
         public string SearchText
         {
             get => _searchText;
@@ -62,6 +65,17 @@ namespace pos.ViewModels
                 }
             }
         }
+
+        public string ProductSearch
+        {
+            get => _productSearch;
+            set
+            {
+                SetProperty(ref _productSearch, value);
+                SearchProductItems();
+            }
+        }
+
 
         public bool IsSearchActive
         {
@@ -102,6 +116,19 @@ namespace pos.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error in SearchProducts: {ex.Message}");
+            }
+        }
+
+        public async Task SearchProductItems()
+        {
+            try
+            {
+                var searchResults = await _dbServices.SeachProuctsAsync(ProductSearch);
+                Products = new ObservableCollection<MenuItem>(searchResults);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error in SearchProductItems: {ex.Message}");
             }
         }
 

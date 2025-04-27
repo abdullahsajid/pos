@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Printing;
+using System.Text.Json;
 
 namespace pos.ViewModels
 {
@@ -16,7 +17,10 @@ namespace pos.ViewModels
         public ObservableCollection<CategoryModel> _categories = new();
 
         [ObservableProperty]
-        public ObservableCollection<ProductModel> _productItem = new();
+        public ObservableCollection<ProductItem> _productItem = new();
+
+        [ObservableProperty]
+        public ObservableCollection<ProductItem> _dealsItems = new();
 
         private readonly DB_Services _dbServices;
 
@@ -31,6 +35,94 @@ namespace pos.ViewModels
 
         [ObservableProperty]
         private string phone;
+
+        private string _searchText;
+        private bool _isSearchActive;
+        private string _productSearch;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                SetProperty(ref _searchText, value);
+
+                IsSearchActive = !string.IsNullOrWhiteSpace(value);
+
+                if (IsSearchActive)
+                {
+                    _ = SearchDeals();
+                }
+            }
+        }
+
+        public string ProductSearch
+        {
+            get => _productSearch;
+            set
+            {
+                SetProperty(ref _productSearch, value);
+                SearchProductItems();
+            }
+        }
+
+        public bool IsSearchActive
+        {
+            get => _isSearchActive;
+            set => SetProperty(ref _isSearchActive, value);
+        }
+
+        public async Task SearchDeals()
+        {
+            try
+            {
+                DealsItems.Clear();
+                var searchResults = await _dbServices.SearchDealItemsAsync(SearchText);
+                if(searchResults.Count > 0)
+                {
+                    foreach (var deal in searchResults)
+                    {
+                        DealsItems.Add(new ProductItem
+                        {
+                            Id = (int)deal.Id,
+                            Name = deal.DealName,
+                            Price = deal.DealAmount
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error in SearchProducts: {ex.Message}");
+            }
+        }
+
+        public async Task SearchProductItems()
+        {
+            try
+            {
+                ProductItem.Clear();
+                var searchResults = await _dbServices.SearchProductDealAsync(ProductSearch);
+                var json = JsonSerializer.Serialize(searchResults, new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+
+                Debug.WriteLine($"Search Results (JSON): {json}");
+                foreach (var deal in searchResults)
+                {
+                    ProductItem.Add(new ProductItem
+                    {
+                        Id = (int)deal.Id,
+                        Name = deal.Name,
+                        Price = deal.Price
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error in SearchProductItems: {ex.Message}");
+            }
+        }
 
         public ObservableCollection<CartModel> CartItems { get; set; } = new();
         public DealCartModel(DB_Services dbServices)
@@ -136,7 +228,7 @@ namespace pos.ViewModels
                     var dealList = await _dbServices.GetDeal();
                     foreach (var deal in dealList)
                     {
-                        ProductItem.Add(new ProductModel
+                        ProductItem.Add(new ProductItem
                         {
                             Id = (int)deal.Id,
                             Name = deal.DealName,
@@ -162,7 +254,7 @@ namespace pos.ViewModels
                 {
                     foreach (var product in productList)
                     {
-                        ProductItem.Add(new ProductModel
+                        ProductItem.Add(new ProductItem
                         {
                             Id = product.Id,
                             Name = product.Name,
@@ -178,7 +270,7 @@ namespace pos.ViewModels
         }
 
         [RelayCommand]
-        private void AddToCart(ProductModel item)
+        private void AddToCart(ProductItem item)
         {
             try
             {

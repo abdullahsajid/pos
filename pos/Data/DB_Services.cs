@@ -3,6 +3,14 @@ using System.Diagnostics;
 
 namespace pos.Data;
 
+public class SearchResult
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+
+    public decimal Price { get; set; }
+}
+
 public class DB_Services : IAsyncDisposable
 {
 	private readonly SQLiteAsyncConnection _database;
@@ -112,6 +120,54 @@ public class DB_Services : IAsyncDisposable
         else
         {
             return await _database.Table<ProductItem>().ToListAsync();
+        }
+    }
+
+    public async Task<List<Deal>> SearchDealItemsAsync(string searchValue)
+    {
+        if (searchValue != null)
+        {
+            return await _database.Table<Deal>().Where(p => p.DealName.ToLower().Contains(searchValue.ToLower())).ToListAsync();
+        }
+        else
+        {
+            return await _database.Table<Deal>().ToListAsync();
+        }
+    }
+
+    public async Task<List<SearchResult>> SearchProductDealAsync(string searchValue)
+    {
+        if (!string.IsNullOrEmpty(searchValue))
+        {
+            var productItems = await _database
+                                    .Table<ProductItem>()
+                                    .Where(p => p.Name.Contains(searchValue))
+                                    .ToListAsync();
+            var dealItems = await _database
+                                    .Table<Deal>()
+                                    .Where(d => d.DealName.Contains(searchValue))
+                                    .ToListAsync();
+            var result = new List<SearchResult>();
+            result.AddRange(productItems.Select(p => new SearchResult
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price
+            }));
+
+            result.AddRange(dealItems.Select(d => new SearchResult
+            {
+                Id = (int)d.Id,
+                Name = d.DealName,
+                Price = d.DealAmount
+            }));
+
+            return result;
+        }
+        else
+        {
+            var productItems = await _database.Table<ProductItem>().ToListAsync();
+            return productItems.Cast<SearchResult>().ToList();
         }
     }
     public async Task<int> DeleteCategory(MenuCategory category)

@@ -25,6 +25,15 @@ namespace pos
                 viewModel.SearchText = e.NewTextValue;
             }
         }
+
+        private void OnSearchProductItems(object sender, TextChangedEventArgs e)
+        {
+            if(BindingContext is HomeViewModel viewModel)
+            {
+                viewModel.ProductSearch = e.NewTextValue;
+            }
+        }
+
     }
 
 }
