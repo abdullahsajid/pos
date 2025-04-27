@@ -23,6 +23,9 @@ namespace pos.ViewModels
         public ObservableCollection<CategoryModel> _addProductCategory= new();
 
         [ObservableProperty]
+        public ObservableCollection<MenuCategory> _menuCategories = new();
+
+        [ObservableProperty]
         public ObservableCollection<ProductItem> _products = new();
 
         [ObservableProperty]
@@ -48,6 +51,7 @@ namespace pos.ViewModels
             await _dbServices.initDatabase();
             CurrentProduct = new ProductItem();
             await GetCategory();
+            await GetProductCategory();
             IsLoading = true;
             await GetProducts();
             IsLoading = false;
@@ -85,6 +89,30 @@ namespace pos.ViewModels
 
                     SelectedCategory = Categories[0];
                     ProductCategory = AddProductCategory[0];
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
+
+        public async Task GetProductCategory()
+        {
+            try
+            {
+                var categoryList = await _dbServices.GetCategory();
+                if (categoryList != null)
+                {
+                    MenuCategories.Clear();
+                    foreach (var category in categoryList)
+                    {
+                        MenuCategories.Add(new MenuCategory
+                        {
+                            Id = category.Id,
+                            Name = category.Name
+                        });
+                    }
                 }
             }
             catch (Exception ex)
@@ -181,6 +209,42 @@ namespace pos.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine("Error: " + ex.Message);
+                await Shell.Current.DisplayAlert("Error", "Something went wrong!", "OK");
+            }
+        }
+
+        [RelayCommand]
+        public async Task UpdateCategoriesAsync(MenuCategory category)
+        {
+            try
+            {
+                var result = await _dbServices.UpdateCategory(category);
+                if(result > 0)
+                {
+                    await GetCategory();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error: " + ex.Message);
+                await Shell.Current.DisplayAlert("Error", "Something went wrong!", "OK");
+            }
+        }
+
+        [RelayCommand]
+        public async Task DeleteCategoryAsync(MenuCategory category)
+        {
+            try
+            {
+                var result = await _dbServices.DeleteCategory(category);
+                if(result > 0)
+                {
+                    await GetCategory();
+                    await GetProductCategory();
+                }
+            }
+            catch (Exception ex)
+            {
                 await Shell.Current.DisplayAlert("Error", "Something went wrong!", "OK");
             }
         }

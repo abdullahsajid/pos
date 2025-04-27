@@ -17,7 +17,10 @@ namespace pos.ViewModels
         public ObservableCollection<CategoryModel> _categories = new();
 
         [ObservableProperty]
-        public ObservableCollection<ProductModel> _products = new();
+        public ObservableCollection<MenuItem> _products = new();
+
+        [ObservableProperty]
+        public ObservableCollection<MenuItem> _productItems = new();
 
         [ObservableProperty]
         public ObservableCollection<Deal> _deals= new();
@@ -42,6 +45,29 @@ namespace pos.ViewModels
         [ObservableProperty]
         private bool hasDeals;
 
+        private string _searchText;
+        private bool _isSearchActive;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                SetProperty(ref _searchText, value);
+
+                IsSearchActive = !string.IsNullOrWhiteSpace(value);
+
+                if (IsSearchActive)
+                {
+                    _ = SearchProducts();
+                }
+            }
+        }
+
+        public bool IsSearchActive
+        {
+            get => _isSearchActive;
+            set => SetProperty(ref _isSearchActive, value);
+        }
         public HomeViewModel(DB_Services dbServices)
         {
             _dbServices = dbServices;
@@ -64,6 +90,19 @@ namespace pos.ViewModels
                 }
                 UpdateTotal();
             };
+        }
+
+        public async Task SearchProducts()
+        {
+            try
+            {
+                var searchResults = await _dbServices.SeachProuctsAsync(SearchText);
+                ProductItems = new ObservableCollection<MenuItem>(searchResults);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error in SearchProducts: {ex.Message}");
+            }
         }
 
         private void CartItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -194,7 +233,7 @@ namespace pos.ViewModels
                     {
                         foreach (var product in productList)
                         {
-                            Products.Add(new ProductModel
+                            Products.Add(new MenuItem
                             {
                                 Id = product.Id,
                                 Name = product.Name,
@@ -234,13 +273,13 @@ namespace pos.ViewModels
         }
 
         [RelayCommand]
-        private void AddToCart(ProductModel item)
+        private void AddToCart(MenuItem item)
         {
             try
             {
                 CartModel cartitem = null;
 
-                if (item is ProductModel product)
+                if (item is MenuItem product)
                 {
                     cartitem = CartItems.FirstOrDefault(c => c.itemId == product.Id);
                     if (cartitem == null)

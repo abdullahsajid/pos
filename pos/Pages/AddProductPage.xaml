@@ -28,8 +28,12 @@
 
 
     <Grid ColumnDefinitions=".40*, .60*">
-        <Grid Grid.Column="0" Margin="20" Padding="10" RowDefinitions="Auto, *, Auto" BackgroundColor="White">
-            <ScrollView>
+        <Grid Grid.Column="0" Margin="20" Padding="10" BackgroundColor="White">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <ScrollView Grid.Row="1">
                 <VerticalStackLayout Spacing="10">
                     <VerticalStackLayout>
                         <Label Text="Categories" Style="{StaticResource lbl}" FontAttributes="Bold"/>
@@ -98,7 +102,7 @@
                             Placeholder="Enter Price"
                             PlaceholderColor="Black"
                             TextColor="Black"
-                            Style="{StaticResource txt}"
+                            
                             Keyboard="Numeric"
                             Text="{Binding CurrentProduct.Price}"
                         />
@@ -121,22 +125,20 @@
                             Text="Save"
                             TextColor="White" 
                             Command="{Binding SaveProductCommand}"
-                        />    
+                        />
                     </Grid>
-                    <ScrollView>
-                        <VerticalStackLayout Spacing="10" Margin="20">
-                            <VerticalStackLayout Spacing="2">
-                                <Label Style="{StaticResource lbl}" FontAttributes="Bold" Text="Name" TextColor="Black"/>
-                                <Entry
+                    <VerticalStackLayout Spacing="10" Margin="20">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Style="{StaticResource lbl}" FontAttributes="Bold" Text="Name" TextColor="Black"/>
+                            <Entry
                                     Placeholder="Enter Category Name"
                                     PlaceholderColor="Black"
                                     TextColor="Black"
                                     Style="{StaticResource txt}"
                                     x:Name="categoryEntryField"
                                 />
-                            </VerticalStackLayout>
                         </VerticalStackLayout>
-                    </ScrollView>
+                    </VerticalStackLayout>
                     <Grid ColumnDefinitions="*,*">
                         <Button
                             Grid.Column="1"
@@ -147,8 +149,8 @@
                             Clicked="saveCategory_Clicked"
                         />
                     </Grid>
-                    <Grid RowSpacing="10">
-                        <CollectionView ItemsSource="{Binding Categories}">
+                     <VerticalStackLayout Spacing="10">
+                        <CollectionView ItemsSource="{Binding MenuCategories}">
                             <CollectionView.ItemsLayout>
                                 <GridItemsLayout Orientation="Vertical" 
                                     Span="3"
@@ -156,21 +158,39 @@
                                     VerticalItemSpacing="10"/>  
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="models:CategoryModel">
+                                <DataTemplate x:DataType="data:MenuCategory">
                                     <Border Padding="20,10"
                                         StrokeThickness="2"
                                         StrokeShape="RoundRectangle 10"
                                         BackgroundColor="#FFF3EA"
                                         Stroke="White">
-                                        <Entry Text="{Binding Name}" 
-                                            FontSize="16" 
-                                            BackgroundColor="Transparent" 
-                                            TextColor="Black" />
+                                        <VerticalStackLayout Spacing="10">
+                                            <Entry 
+                                               Text="{Binding Name}" 
+                                               FontSize="16" 
+                                               BackgroundColor="Transparent" 
+                                               TextColor="Black" 
+                                            /> 
+                                            <HorizontalStackLayout HorizontalOptions="Center">
+                                                <Button 
+                                                    ImageSource="check.png" 
+                                                    BackgroundColor="Transparent"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UpdateCategoriesCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                />
+                                                <Button 
+                                                    ImageSource="delete.png"                   
+                                                    BackgroundColor="Transparent"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteCategoryCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                />
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
                                     </Border>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
-                    </Grid>
+                    </VerticalStackLayout>
                 </VerticalStackLayout>
             </ScrollView>
         </Grid>

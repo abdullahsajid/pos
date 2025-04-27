@@ -84,6 +84,51 @@ public class DB_Services : IAsyncDisposable
         return await _database.Table<MenuCategory>().ToListAsync();
     }
 
+    public async Task<int> UpdateCategory(MenuCategory category)
+    {
+        var categories = await _database.Table<MenuCategory>().Where(x => x.Id == category.Id).FirstOrDefaultAsync();
+        if(categories == null)
+        {
+            return 0;
+        }
+        categories.Name = category.Name;
+        try
+        {
+            return await _database.UpdateAsync(categories);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error updating category: {ex.Message}");
+            return 0;
+        }
+    }
+
+    public async Task<List<ProductItem>> SeachProuctsAsync(string searchValue)
+    {
+        if(searchValue != null)
+        {
+            return await _database.Table<ProductItem>().Where(p => p.Name.ToLower().Contains(searchValue.ToLower())).ToListAsync();
+        }
+        else
+        {
+            return await _database.Table<ProductItem>().ToListAsync();
+        }
+    }
+    public async Task<int> DeleteCategory(MenuCategory category)
+    {
+        var categories = await _database.Table<MenuCategory>().Where(x => x.Id == category.Id).FirstOrDefaultAsync();
+        if (categories == null)
+        {
+            return 0;
+        }
+        var deleted = await _database.DeleteAsync(categories);
+        if (deleted == 0)
+        {
+            return 0;
+        }
+        return deleted;
+    }
+
     public async Task<List<ProductItem>> GetProducts()
     {
         return await _database.Table<ProductItem>().ToListAsync();
