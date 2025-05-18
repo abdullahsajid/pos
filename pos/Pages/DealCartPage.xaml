@@ -267,7 +267,7 @@
                 BackgroundColor="#FFF"
             />
             <Grid Grid.Row="3" RowDefinitions="Auto, Auto, Auto">
-                <CollectionView Grid.Row="0" x:Name="ProductListView" ItemsSource="{Binding ProductItem}" VerticalOptions="Center">
+                <CollectionView Grid.Row="0" x:Name="ProductListView" ItemsSource="{Binding ProductItem}" IsVisible="{Binding HasDeals}" VerticalOptions="Center">
                     <CollectionView.ItemsLayout>
                         <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
                     </CollectionView.ItemsLayout>
@@ -288,6 +288,30 @@
                                         CommandParameter="{Binding .}"/>
                                 </VerticalStackLayout>
 
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                <CollectionView Grid.Row="1"  ItemsSource="{Binding SearchProductsItems}" IsVisible="{Binding HasProducts}" VerticalOptions="Center">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="data:SearchResult">
+                            <Border Padding="20,10"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 10"
+                                >
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="{Binding Name}" TextColor="black" FontSize="18"/>
+                                    <Label Text="{Binding Price}" FontSize="24" TextColor="black"/>
+                                    <Button Text="Add to cart" 
+                                        BackgroundColor="#753F21" 
+                                        TextColor="White" 
+                                        CornerRadius="10" 
+                                        Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.AddToCartCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                </VerticalStackLayout>
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

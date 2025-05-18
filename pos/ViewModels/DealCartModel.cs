@@ -22,6 +22,9 @@ namespace pos.ViewModels
         [ObservableProperty]
         public ObservableCollection<ProductItem> _dealsItems = new();
 
+        [ObservableProperty]
+        public ObservableCollection<SearchResult> _searchProductsItems = new();
+
         private readonly DB_Services _dbServices;
 
         [ObservableProperty]
@@ -35,6 +38,11 @@ namespace pos.ViewModels
 
         [ObservableProperty]
         private string phone;
+
+        [ObservableProperty]
+        private bool hasProducts;
+        [ObservableProperty]
+        private bool hasDeals;
 
         private string _searchText;
         private bool _isSearchActive;
@@ -101,6 +109,13 @@ namespace pos.ViewModels
             try
             {
                 ProductItem.Clear();
+                SearchProductsItems.Clear();
+                if (string.IsNullOrWhiteSpace(ProductSearch))
+                {
+                    HasProducts = false;
+                    HasDeals = false;
+                    return;
+                }
                 var searchResults = await _dbServices.SearchProductDealAsync(ProductSearch);
                 var json = JsonSerializer.Serialize(searchResults, new JsonSerializerOptions
                 {
@@ -110,17 +125,20 @@ namespace pos.ViewModels
                 Debug.WriteLine($"Search Results (JSON): {json}");
                 foreach (var deal in searchResults)
                 {
-                    ProductItem.Add(new ProductItem
+                    SearchProductsItems.Add(new SearchResult
                     {
                         Id = (int)deal.Id,
                         Name = deal.Name,
                         Price = deal.Price
                     });
                 }
+                HasProducts = SearchProductsItems.Count > 0;
+                HasDeals = false;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error in SearchProductItems: {ex.Message}");
+                HasProducts = false;
             }
         }
 
@@ -223,6 +241,7 @@ namespace pos.ViewModels
             try
             {
                 ProductItem.Clear();
+                SearchProductsItems.Clear();
                 if (SelectedCategory.Id == 0)
                 {
                     var dealList = await _dbServices.GetDeal();
@@ -235,11 +254,13 @@ namespace pos.ViewModels
                             Price = deal.DealAmount
                         });
                     }
+                    HasDeals = true;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
+                HasDeals = false;
             }
         }
 
@@ -248,6 +269,7 @@ namespace pos.ViewModels
             try
             {
                 ProductItem.Clear();
+                SearchProductsItems.Clear();
                 var productList = await _dbServices.GetProductsByCategory(SelectedCategory.Id);
                 
                 if (productList != null)
@@ -261,11 +283,13 @@ namespace pos.ViewModels
                             Price = product.Price
                         });
                     }
+                    HasDeals = true;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
+                HasDeals = false;
             }
         }
 
