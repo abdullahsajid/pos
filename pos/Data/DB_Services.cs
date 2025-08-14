@@ -29,6 +29,7 @@ public class DB_Services : IAsyncDisposable
         await _database.CreateTableAsync<OrderItem>();
         await _database.CreateTableAsync<Deal>();
         await _database.CreateTableAsync<DealItem>();
+        await _database.CreateTableAsync<Settings>();
     }
 
     public async Task<int> AddCategory(MenuCategory category)
@@ -266,6 +267,38 @@ public class DB_Services : IAsyncDisposable
         }
         
         return await _database.DeleteAsync(deals);
+    }
+
+    public async Task<Settings> createSettings(Settings settings)
+    {
+        var existingSettings = await _database.Table<Settings>().FirstOrDefaultAsync();
+        if (existingSettings != null)
+        {
+            existingSettings.CompanyName = settings.CompanyName;
+            existingSettings.CompanyAddress = settings.CompanyAddress;
+            existingSettings.CompanyPhone = settings.CompanyPhone;
+            existingSettings.Image = settings.Image;
+            await _database.UpdateAsync(existingSettings);
+            return existingSettings;
+        }
+        else
+        {
+            await _database.InsertAsync(settings);
+            return settings;
+        }
+    }
+
+    public async Task<Settings?> getSettings()
+    {
+        var existingSettings = await _database.Table<Settings>().FirstOrDefaultAsync();
+        if (existingSettings != null)
+        {
+            return existingSettings;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public async ValueTask DisposeAsync()

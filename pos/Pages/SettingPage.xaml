@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Shell.NavBarIsVisible="True"
+             Shell.BackgroundColor="#FFF3EA"
+             Shell.TitleColor="#753F21"
+             BackgroundColor="#FFF3EA"
+             x:Class="pos.Pages.SettingPage"
+             Title="SettingPage"
+             xmlns:models="clr-namespace:pos.Models"
+             xmlns:data="clr-namespace:pos.Data"
+             xmlns:vm="clr-namespace:pos.ViewModels"
+             x:DataType="vm:SettingsModel">
+    <ScrollView>
+        <VerticalStackLayout>
+            <Frame BorderColor="Transparent" BackgroundColor="#FFF3EA" CornerRadius="10" Padding="10">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Company Logo" FontAttributes="Bold" TextColor="#753F21" />
+                    <Image x:Name="CompanyLogo" 
+                           HeightRequest="150"
+                           WidthRequest="150"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center" 
+                           Source="{Binding Image}"/>
+                    <Button Text="Upload Logo"
+                            BackgroundColor="#753F21"
+                            TextColor="White"
+                            CornerRadius="5" 
+                            Command="{Binding UploadImageCommand}"
+                    />
+                </VerticalStackLayout>
+            </Frame>
+            <Frame BorderColor="Transparent" BackgroundColor="#FFF3EA" CornerRadius="10" Padding="10">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Company Name" TextColor="#753F21" FontAttributes="Bold" />
+                    <Entry Text="{Binding CompanyName, Mode=TwoWay}"
+                           Placeholder="Enter company name" 
+                           TextColor="#000"/>
+                </VerticalStackLayout>
+            </Frame>
+            <Frame BorderColor="Transparent" BackgroundColor="#FFF3EA" CornerRadius="10" Padding="10">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Address" TextColor="#753F21" FontAttributes="Bold" />
+                    <Editor Text="{Binding CompanyAddress, Mode=TwoWay}"
+                            Placeholder="Enter company address"
+                            HeightRequest="100" 
+                            TextColor="#000"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="LightGray" BackgroundColor="#FFF3EA" CornerRadius="10" Padding="10">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Contact Number" TextColor="#753F21" FontAttributes="Bold" />
+                    <Entry Text="{Binding CompanyPhone, Mode=TwoWay}"
+                           Placeholder="Enter contact number"
+                           Keyboard="Telephone" 
+                           TextColor="#000"/>
+                </VerticalStackLayout>
+            </Frame>
+            <Button Text="Save Settings"
+                    Command="{Binding SaveSettingsCommand}"
+                    BackgroundColor="#753F21"
+                    TextColor="White"
+                    CornerRadius="5"
+                    HorizontalOptions="Fill" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

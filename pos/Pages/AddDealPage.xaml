@@ -106,10 +106,10 @@
                 </VerticalStackLayout>
 
                 <Grid RowDefinitions="Auto,Auto,Auto,Auto" 
-              ColumnDefinitions="*,*"
-              RowSpacing="15"
-              ColumnSpacing="10"
-              Padding="15">
+                  ColumnDefinitions="*,*"
+                  RowSpacing="15"
+                  ColumnSpacing="10"
+                  Padding="15">
                     <VerticalStackLayout Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
                         <Label Text="Item Name" FontAttributes="Bold" TextColor="Black"/>
                         <Entry Placeholder="Enter Item Name" 

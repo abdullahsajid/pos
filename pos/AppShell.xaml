@@ -45,4 +45,11 @@
         Route="AddDealPage"
      />
 
+    <ShellContent
+        Title="Settings"
+        ContentTemplate="{DataTemplate pages:SettingPage}"
+        Icon="settings.png"
+        Route="SettingPage"
+     />
+
 </Shell>

@@ -34,6 +34,8 @@ public static class MauiProgram
 		builder.Services.AddSingleton<AddDealPage>();
 		builder.Services.AddSingleton<DealCartModel>();
 		builder.Services.AddSingleton<DealCartPage>();
+		builder.Services.AddSingleton<SettingsModel>();
+		builder.Services.AddSingleton<SettingPage>();
 
 
         return builder.Build();

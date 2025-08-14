@@ -363,6 +363,11 @@ namespace pos.ViewModels
         public async void PrintInvoice()
         {
             Debug.WriteLine("Printing Invoice");
+            if (CartItems.Count == 0)
+            {
+                await Shell.Current.DisplayAlert("Error", "Please add CartItems!", "OK");
+                return;
+            }
             var orderNumber = await _dbServices.GetNextOrderNumber();
 
             var order = new Order

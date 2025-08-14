@@ -1,13 +1,14 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using pos.Models;
 using pos.Data;
+using pos.Models;
 using System.Collections.ObjectModel;
-using MenuItem = pos.Data.ProductItem;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing.Printing;
 using System.Drawing;
+using System.Drawing.Printing;
+using MenuItem = pos.Data.ProductItem;
 
 namespace pos.ViewModels
 {
@@ -46,6 +47,7 @@ namespace pos.ViewModels
         private bool hasDeals;
 
         private string _productSearch;
+        private Settings? _cachedSettings;
 
         private string _searchText;
         private bool _isSearchActive;
@@ -349,6 +351,12 @@ namespace pos.ViewModels
         public async void PrintInvoice()
         {
             Debug.WriteLine("Printing Invoice");
+            if (CartItems.Count == 0)
+            {
+                await Shell.Current.DisplayAlert("Error", "Please add CartItems!", "OK");
+                return;
+            }
+            _cachedSettings = await _dbServices.getSettings();
             var orderNumber = await _dbServices.GetNextOrderNumber();
 
             var order = new Order
@@ -382,12 +390,12 @@ namespace pos.ViewModels
             Debug.WriteLine("Invoice Printed");
         }
 
-        public void PrintPageHandler(object sender,System.Drawing.Printing.PrintPageEventArgs e)
+        public async void PrintPageHandler(object sender, System.Drawing.Printing.PrintPageEventArgs e)
         {
             Graphics g = e.Graphics;
             int yPos = 30;
             float lineSpacing = 30;
-
+            var settings = _cachedSettings ?? new Settings();
             StringFormat centerFormat = new StringFormat
             {
                 Alignment = StringAlignment.Center,
@@ -396,16 +404,16 @@ namespace pos.ViewModels
 
             float pageWidth = e.PageBounds.Width;
 
-            g.DrawString("Super Sweets Bakers", new System.Drawing.Font("Arial", 20, FontStyle.Bold), Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+            g.DrawString(settings.CompanyName, new System.Drawing.Font("Arial", 20, FontStyle.Bold), Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
             yPos += (int)lineSpacing;
 
-            g.DrawString("Laiq Ali Chowk Wah Cantt", new System.Drawing.Font("Arial", 17), Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+            g.DrawString(settings.CompanyAddress, new System.Drawing.Font("Arial", 17), Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
             yPos += (int)lineSpacing;
 
-            g.DrawString("Phone no# 03135172181", new System.Drawing.Font("Arial", 15), Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+            g.DrawString(settings.CompanyPhone, new System.Drawing.Font("Arial", 15), Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
             yPos += (int)lineSpacing;
 
-            g.DrawString($"Customer:", new System.Drawing.Font("Arial", 12,FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(10, yPos));
+            g.DrawString($"Customer:", new System.Drawing.Font("Arial", 12, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(10, yPos));
             yPos += (int)lineSpacing;
 
             string dateLabel = "Date: ";
@@ -442,6 +450,13 @@ namespace pos.ViewModels
             g.DrawString(Change, new System.Drawing.Font("Arial", 12, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(270, yPos));
             yPos += (int)lineSpacing;
             e.HasMorePages = false;
+
+            if (e.HasMorePages == false)
+            {
+                CartItems.Clear();
+                Total = 0;
+                Payment = string.Empty;
+            }
         }
     }
 }
