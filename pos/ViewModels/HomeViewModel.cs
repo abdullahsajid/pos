@@ -47,6 +47,7 @@ namespace pos.ViewModels
         private bool hasDeals;
 
         private string _productSearch;
+        private string _lastOrderNumber;
         private Settings? _cachedSettings;
 
         private string _searchText;
@@ -357,11 +358,11 @@ namespace pos.ViewModels
                 return;
             }
             _cachedSettings = await _dbServices.getSettings();
-            var orderNumber = await _dbServices.GetNextOrderNumber();
+            _lastOrderNumber = await _dbServices.GetNextOrderNumber();
 
             var order = new Order
             {
-                OrderNumber = $"ORD-{orderNumber}",
+                OrderNumber = $"ORD-{_lastOrderNumber}",
                 OrderDate = DateTime.Now,
                 TotalAmount = Total,
                 PaymentAmount = decimal.TryParse(Payment, out decimal paymentAmount) ? paymentAmount : 0,
@@ -394,69 +395,90 @@ namespace pos.ViewModels
         {
             Graphics g = e.Graphics;
             int yPos = 30;
-            float lineSpacing = 30;
+            float lineSpacing = 25;
             var settings = _cachedSettings ?? new Settings();
+
+            float pageWidth = e.PageBounds.Width;
             StringFormat centerFormat = new StringFormat
             {
                 Alignment = StringAlignment.Center,
                 LineAlignment = StringAlignment.Center,
             };
 
-            float pageWidth = e.PageBounds.Width;
-
-            g.DrawString(settings.CompanyName, new System.Drawing.Font("Arial", 20, FontStyle.Bold), Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+            // --- Header ---
+            g.DrawString(settings.CompanyName, new System.Drawing.Font("Arial", 16, FontStyle.Bold), Brushes.Black,
+                new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
             yPos += (int)lineSpacing;
 
-            g.DrawString(settings.CompanyAddress, new System.Drawing.Font("Arial", 17), Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+            g.DrawString($"{settings.CompanyAddress} | {settings.CompanyPhone}", new System.Drawing.Font("Arial", 10), Brushes.Black,
+                new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
             yPos += (int)lineSpacing;
 
-            g.DrawString(settings.CompanyPhone, new System.Drawing.Font("Arial", 15), Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+            g.DrawString(new string('-', 40), new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(0, yPos));
             yPos += (int)lineSpacing;
 
-            g.DrawString($"Customer:", new System.Drawing.Font("Arial", 12, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(10, yPos));
+            // --- Order Info ---
+            g.DrawString($"Order No: ORD-{_lastOrderNumber}", new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(10, yPos));
             yPos += (int)lineSpacing;
 
-            string dateLabel = "Date: ";
-            float dateLabelWidth = g.MeasureString(dateLabel, new System.Drawing.Font("Arial", 8, FontStyle.Bold)).Width;
-            g.DrawString(dateLabel, new System.Drawing.Font("Arial", 12, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(10, yPos));
-
-            string dateValue = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-            float spaceBetween = 20;
-            g.DrawString(dateValue, new System.Drawing.Font("Arial", 12), Brushes.Black, new System.Drawing.PointF(10 + dateLabelWidth + spaceBetween, yPos));
+            g.DrawString($"Date: {DateTime.Now:dd-MMM-yyyy hh:mm tt}", new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(10, yPos));
             yPos += (int)lineSpacing;
 
-            g.DrawString("Product", new System.Drawing.Font("Arial", 12, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(10, yPos));
-            g.DrawString("Qty", new System.Drawing.Font("Arial", 12, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(170, yPos));
-            g.DrawString("Price", new System.Drawing.Font("Arial", 12, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(220, yPos));
-            g.DrawString("T-Amount", new System.Drawing.Font("Arial", 12, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(270, yPos));
-
+            g.DrawString(new string('-', 40), new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(0, yPos));
             yPos += (int)lineSpacing;
+
+            // --- Items Header ---
+            g.DrawString("Item", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(10, yPos));
+            g.DrawString("Qty", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(150, yPos));
+            g.DrawString("Price", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(200, yPos));
+            yPos += (int)lineSpacing;
+
+            // --- Items ---
             foreach (var item in CartItems)
             {
-                g.DrawString(item.Name, new System.Drawing.Font("Arial", 12), Brushes.Black, new System.Drawing.PointF(10, yPos));
-                g.DrawString(item.Quantity.ToString(), new System.Drawing.Font("Arial", 12), Brushes.Black, new System.Drawing.PointF(170, yPos));
-                g.DrawString(item.Price.ToString(), new System.Drawing.Font("Arial", 12), Brushes.Black, new System.Drawing.PointF(220, yPos));
-                g.DrawString(item.Total.ToString(), new System.Drawing.Font("Arial", 12), Brushes.Black, new System.Drawing.PointF(270, yPos));
+                g.DrawString(item.Name, new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(10, yPos));
+                g.DrawString(item.Quantity.ToString(), new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(150, yPos));
+                g.DrawString($"{item.Price * item.Quantity:0.00}", new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(200, yPos));
                 yPos += (int)lineSpacing;
             }
+
+            g.DrawString(new string('-', 40), new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(0, yPos));
             yPos += (int)lineSpacing;
-            g.DrawString("Total Amount: ", new System.Drawing.Font("Arial", 12, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(10, yPos));
-            g.DrawString(Total.ToString(), new System.Drawing.Font("Arial", 12, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(270, yPos));
+
+            // --- Totals ---
+            g.DrawString($"Subtotal: {Total:0.00}", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(120, yPos));
             yPos += (int)lineSpacing;
-            g.DrawString("Payment: ", new System.Drawing.Font("Arial", 12, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(10, yPos));
-            g.DrawString(Payment, new System.Drawing.Font("Arial", 12, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(270, yPos));
+
+            //decimal tax = Math.Round(Total * 0.05m, 2);
+            //g.DrawString($"Tax (5%): {tax:0.00}", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(120, yPos));
+            //yPos += (int)lineSpacing;
+
+            g.DrawString($"Total: {Total:0.00}", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(120, yPos));
             yPos += (int)lineSpacing;
-            g.DrawString("Change: ", new System.Drawing.Font("Arial", 12, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(10, yPos));
-            g.DrawString(Change, new System.Drawing.Font("Arial", 12, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(270, yPos));
+
+            g.DrawString($"Payment: {Payment}", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(10, yPos));
             yPos += (int)lineSpacing;
+
+            g.DrawString(new string('-', 40), new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(0, yPos));
+            yPos += (int)lineSpacing;
+
+            // --- Footer ---
+            g.DrawString("Thank you for shopping!", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black,
+                new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+            yPos += (int)lineSpacing;
+
+            g.DrawString("Visit again", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black,
+                new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+
             e.HasMorePages = false;
 
-            if (e.HasMorePages == false)
+            if (!e.HasMorePages)
             {
                 CartItems.Clear();
                 Total = 0;
                 Payment = string.Empty;
             }
         }
+
     }
 }

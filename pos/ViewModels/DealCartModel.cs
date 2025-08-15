@@ -44,6 +44,7 @@ namespace pos.ViewModels
         [ObservableProperty]
         private bool hasDeals;
 
+        private Settings? _cachedSettings;
         private string _searchText;
         private bool _isSearchActive;
         private string _productSearch;
@@ -368,6 +369,7 @@ namespace pos.ViewModels
                 await Shell.Current.DisplayAlert("Error", "Please add CartItems!", "OK");
                 return;
             }
+            _cachedSettings = await _dbServices.getSettings();
             var orderNumber = await _dbServices.GetNextOrderNumber();
 
             var order = new Order
@@ -413,7 +415,7 @@ namespace pos.ViewModels
             Graphics g = e.Graphics;
             int yPos = 30;
             float lineSpacing = 30;
-
+            var settings = _cachedSettings ?? new Settings();
             StringFormat centerFormat = new StringFormat
             {
                 Alignment = StringAlignment.Center,
@@ -424,13 +426,13 @@ namespace pos.ViewModels
 
             string copyType = _currentPage == 0 ? "Merchant Copy" : "Customer Copy";
 
-            g.DrawString("Super Sweets Bakers", new System.Drawing.Font("Arial", 20, FontStyle.Bold), Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+            g.DrawString(settings.CompanyName, new System.Drawing.Font("Arial", 20, FontStyle.Bold), Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
             yPos += (int)lineSpacing;
 
-            g.DrawString("Laiq Ali Chowk Wah Cantt", new System.Drawing.Font("Arial", 17), Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+            g.DrawString(settings.CompanyAddress, new System.Drawing.Font("Arial", 17), Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
             yPos += (int)lineSpacing;
 
-            g.DrawString("Phone no# 03135172181", new System.Drawing.Font("Arial", 15), Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+            g.DrawString(settings.CompanyPhone, new System.Drawing.Font("Arial", 15), Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
             yPos += (int)lineSpacing;
 
             g.DrawString($"Customer:", new System.Drawing.Font("Arial", 12, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(10, yPos));
