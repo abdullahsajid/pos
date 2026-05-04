@@ -100,7 +100,7 @@
                         Style="{StaticResource txt}"
                         Keyboard="Numeric"
                         Text="{Binding Total}"
-                        IsReadOnly="True"
+                        IsReadOnly="False"
                     />
                     </VerticalStackLayout>
                 </VerticalStackLayout>

@@ -116,7 +116,10 @@ public class DB_Services : IAsyncDisposable
     {
         if(searchValue != null)
         {
-            return await _database.Table<ProductItem>().Where(p => p.Name.ToLower().Contains(searchValue.ToLower())).ToListAsync();
+            var search = searchValue.ToLower();
+            return await _database.Table<ProductItem>()
+                .Where(p => p.Name.ToLower().Contains(search) || (p.Barcode != null && p.Barcode.ToLower().Contains(search)))
+                .ToListAsync();
         }
         else
         {
@@ -219,6 +222,8 @@ public class DB_Services : IAsyncDisposable
         }
         products.Name = product.Name;
         products.Price = product.Price;
+        products.Barcode = product.Barcode;
+        products.ImagePath = product.ImagePath;
         return await _database.UpdateAsync(products);
     }
 

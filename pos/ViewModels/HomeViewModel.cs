@@ -1,4 +1,4 @@
-﻿
+
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using pos.Data;
@@ -267,7 +267,8 @@ namespace pos.ViewModels
                             {
                                 Id = product.Id,
                                 Name = product.Name,
-                                Price = product.Price
+                                Price = product.Price,
+                                ImagePath = product.ImagePath
                             });
                         }
                     }
@@ -336,6 +337,16 @@ namespace pos.ViewModels
             }
         }
 
+        public void SelectFirstSearchResult()
+        {
+            if (ProductItems != null && ProductItems.Any())
+            {
+                AddToCart(ProductItems.First());
+            }
+            SearchText = string.Empty;
+            IsSearchActive = false;
+        }
+
         public void UpdateTotal()
         {
             Total = CartItems.Sum(c => c.Total);
@@ -346,6 +357,12 @@ namespace pos.ViewModels
         {
             CartItems.Remove(cartItem);
             UpdateTotal();
+        }
+
+        [RelayCommand]
+        public void FocusSearch()
+        {
+            MessagingCenter.Send(this, "FocusCartSearch");
         }
 
         [RelayCommand]
@@ -384,6 +401,10 @@ namespace pos.ViewModels
                 };
                 await _dbServices.AddOrderItem(orderItem);
             }
+
+            _currentPage = 0;
+            _totalPages = 2;
+
             PrintDocument printDoc = new PrintDocument();
 
             printDoc.PrintPage += PrintPageHandler;
@@ -391,86 +412,156 @@ namespace pos.ViewModels
             Debug.WriteLine("Invoice Printed");
         }
 
+        private int _currentPage = 0;
+        private int _totalPages = 2;
+
         public async void PrintPageHandler(object sender, System.Drawing.Printing.PrintPageEventArgs e)
         {
             Graphics g = e.Graphics;
-            int yPos = 30;
-            float lineSpacing = 25;
-            var settings = _cachedSettings ?? new Settings();
+            int yPos = 20;
+            float lineSpacing = 22; // Tighter line spacing for receipt
+            var settings = _cachedSettings ?? new Settings { CompanyName = "POS System", CompanyAddress = "Address", CompanyPhone = "000-0000000" };
 
-            float pageWidth = e.PageBounds.Width;
+            // For 80mm thermal at 203 DPI, usable width is approx 280-300px
+            float pageWidth = 280; // Standard usable width for 80mm thermal
+
             StringFormat centerFormat = new StringFormat
             {
                 Alignment = StringAlignment.Center,
                 LineAlignment = StringAlignment.Center,
             };
 
-            // --- Header ---
-            g.DrawString(settings.CompanyName, new System.Drawing.Font("Arial", 16, FontStyle.Bold), Brushes.Black,
-                new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+            StringFormat rightFormat = new StringFormat
+            {
+                Alignment = StringAlignment.Far,
+                LineAlignment = StringAlignment.Center,
+            };
+
+            StringFormat leftFormat = new StringFormat
+            {
+                Alignment = StringAlignment.Near,
+                LineAlignment = StringAlignment.Center,
+            };
+
+            // Font Families
+            var headerFont = new System.Drawing.Font("Arial", 14, FontStyle.Bold);
+            var subHeaderFont = new System.Drawing.Font("Arial", 9);
+            var bodyFont = new System.Drawing.Font("Arial", 9);
+            var boldFont = new System.Drawing.Font("Arial", 9, FontStyle.Bold);
+
+            // --- Header --- (Customer Copy Only)
+            if (_currentPage == 1)
+            {
+                // Draw Logo if available
+                if (!string.IsNullOrEmpty(settings.Image) && System.IO.File.Exists(settings.Image))
+                {
+                    try
+                    {
+                        using (System.Drawing.Image logo = System.Drawing.Image.FromFile(settings.Image))
+                        {
+                            // Calculate logo dimensions: Fixed width of 100px, maintain aspect ratio
+                            int targetWidth = 100;
+                            int targetHeight = (int)((float)logo.Height * targetWidth / logo.Width);
+                            
+                            // Center horizontally
+                            int xPos = (int)((pageWidth - targetWidth) / 2);
+                            
+                            g.DrawImage(logo, new Rectangle(xPos, yPos, targetWidth, targetHeight));
+                            yPos += targetHeight + 10;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Failed to print logo: {ex.Message}");
+                    }
+                }
+
+                g.DrawString(settings.CompanyName, headerFont, Brushes.Black,
+                    new RectangleF(0, yPos, pageWidth, lineSpacing + 5), centerFormat);
+                yPos += (int)lineSpacing + 8;
+
+                g.DrawString(settings.CompanyAddress, subHeaderFont, Brushes.Black,
+                    new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+                yPos += (int)lineSpacing;
+
+                g.DrawString(settings.CompanyPhone, subHeaderFont, Brushes.Black,
+                    new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+                yPos += (int)lineSpacing;
+
+                g.DrawString(new string('-', 45), bodyFont, Brushes.Black, new System.Drawing.PointF(0, yPos));
+                yPos += (int)lineSpacing - 5;
+            }
+
+            // --- Order Info --- (Both Copies)
+            g.DrawString($"Invoice: ORD-{_lastOrderNumber}", bodyFont, Brushes.Black, new System.Drawing.PointF(5, yPos));
             yPos += (int)lineSpacing;
 
-            g.DrawString($"{settings.CompanyAddress} | {settings.CompanyPhone}", new System.Drawing.Font("Arial", 10), Brushes.Black,
-                new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+            g.DrawString($"Date: {DateTime.Now:dd-MM-yy hh:mm tt}", bodyFont, Brushes.Black, new System.Drawing.PointF(5, yPos));
             yPos += (int)lineSpacing;
 
-            g.DrawString(new string('-', 40), new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(0, yPos));
+            string copyType = _currentPage == 0 ? "KITCHEN COPY" : "CUSTOMER COPY";
+            g.DrawString($"*** {copyType} ***", boldFont, Brushes.Black, new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
             yPos += (int)lineSpacing;
 
-            // --- Order Info ---
-            g.DrawString($"Order No: ORD-{_lastOrderNumber}", new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(10, yPos));
+            g.DrawString(new string('-', 45), bodyFont, Brushes.Black, new System.Drawing.PointF(0, yPos));
+            yPos += (int)lineSpacing - 5;
+
+            // --- Items Header --- (Both Copies)
+            g.DrawString("ITEM", boldFont, Brushes.Black, new RectangleF(5, yPos, 150, lineSpacing), leftFormat);
+            g.DrawString("QTY", boldFont, Brushes.Black, new RectangleF(155, yPos, 40, lineSpacing), rightFormat);
+            g.DrawString("TOTAL", boldFont, Brushes.Black, new RectangleF(200, yPos, 75, lineSpacing), rightFormat);
             yPos += (int)lineSpacing;
 
-            g.DrawString($"Date: {DateTime.Now:dd-MMM-yyyy hh:mm tt}", new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(10, yPos));
-            yPos += (int)lineSpacing;
+            g.DrawString(new string('-', 45), bodyFont, Brushes.Black, new System.Drawing.PointF(0, yPos));
+            yPos += (int)lineSpacing - 5;
 
-            g.DrawString(new string('-', 40), new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(0, yPos));
-            yPos += (int)lineSpacing;
-
-            // --- Items Header ---
-            g.DrawString("Item", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(10, yPos));
-            g.DrawString("Qty", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(150, yPos));
-            g.DrawString("Price", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(200, yPos));
-            yPos += (int)lineSpacing;
-
-            // --- Items ---
+            // --- Items --- (Both Copies)
             foreach (var item in CartItems)
             {
-                g.DrawString(item.Name, new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(10, yPos));
-                g.DrawString(item.Quantity.ToString(), new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(150, yPos));
-                g.DrawString($"{item.Price * item.Quantity:0.00}", new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(200, yPos));
+                // Item Name (can wrap if needed, but for now single line)
+                string itemName = item.Name;
+                if (itemName.Length > 50) itemName = itemName.Substring(0, 50) + "...";
+
+                g.DrawString(itemName, bodyFont, Brushes.Black, new RectangleF(5, yPos, 150, lineSpacing), leftFormat);
+                g.DrawString(item.Quantity.ToString(), bodyFont, Brushes.Black, new RectangleF(155, yPos, 40, lineSpacing), rightFormat);
+                g.DrawString($"{item.Price * item.Quantity:N2}", bodyFont, Brushes.Black, new RectangleF(200, yPos, 75, lineSpacing), rightFormat);
                 yPos += (int)lineSpacing;
             }
 
-            g.DrawString(new string('-', 40), new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(0, yPos));
+            g.DrawString(new string('-', 45), bodyFont, Brushes.Black, new System.Drawing.PointF(0, yPos));
+            yPos += (int)lineSpacing - 5;
+
+            // --- Totals --- (Both Copies for Subtotal)
+            g.DrawString("SUBTOTAL:", boldFont, Brushes.Black, new RectangleF(100, yPos, 100, lineSpacing), rightFormat);
+            g.DrawString($"{Total:N2}", boldFont, Brushes.Black, new RectangleF(200, yPos, 75, lineSpacing), rightFormat);
             yPos += (int)lineSpacing;
 
-            // --- Totals ---
-            g.DrawString($"Subtotal: {Total:0.00}", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(120, yPos));
-            yPos += (int)lineSpacing;
+            // --- Payment & Footer --- (Customer Copy Only)
+            if (_currentPage == 1)
+            {
+                g.DrawString("PAYMENT:", bodyFont, Brushes.Black, new RectangleF(100, yPos, 100, lineSpacing), rightFormat);
+                g.DrawString($"{(decimal.TryParse(Payment, out decimal p) ? p : 0):N2}", bodyFont, Brushes.Black, new RectangleF(200, yPos, 75, lineSpacing), rightFormat);
+                yPos += (int)lineSpacing;
 
-            //decimal tax = Math.Round(Total * 0.05m, 2);
-            //g.DrawString($"Tax (5%): {tax:0.00}", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(120, yPos));
-            //yPos += (int)lineSpacing;
+                g.DrawString("CHANGE:", bodyFont, Brushes.Black, new RectangleF(100, yPos, 100, lineSpacing), rightFormat);
+                g.DrawString($"{(decimal.TryParse(Change, out decimal c) ? c : 0):N2}", bodyFont, Brushes.Black, new RectangleF(200, yPos, 75, lineSpacing), rightFormat);
+                yPos += (int)lineSpacing + 5;
 
-            g.DrawString($"Total: {Total:0.00}", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(120, yPos));
-            yPos += (int)lineSpacing;
+                g.DrawString(new string('=', 45), bodyFont, Brushes.Black, new System.Drawing.PointF(0, yPos));
+                yPos += (int)lineSpacing - 5;
 
-            g.DrawString($"Payment: {Payment}", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black, new System.Drawing.PointF(10, yPos));
-            yPos += (int)lineSpacing;
+                // --- Footer ---
+                g.DrawString("THANK YOU!", boldFont, Brushes.Black,
+                    new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+                yPos += (int)lineSpacing;
 
-            g.DrawString(new string('-', 40), new System.Drawing.Font("Arial", 10), Brushes.Black, new System.Drawing.PointF(0, yPos));
-            yPos += (int)lineSpacing;
+                g.DrawString("*** ENJOY YOUR MEAL ***", subHeaderFont, Brushes.Black,
+                    new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
+            }
 
-            // --- Footer ---
-            g.DrawString("Thank you for shopping!", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black,
-                new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
-            yPos += (int)lineSpacing;
+            _currentPage++;
 
-            g.DrawString("Visit again", new System.Drawing.Font("Arial", 10, FontStyle.Bold), Brushes.Black,
-                new RectangleF(0, yPos, pageWidth, lineSpacing), centerFormat);
-
-            e.HasMorePages = false;
+            e.HasMorePages = _currentPage < _totalPages;
 
             if (!e.HasMorePages)
             {

@@ -1,4 +1,4 @@
-﻿using pos.Data;
+using pos.Data;
 using System.Globalization;
 
 namespace pos

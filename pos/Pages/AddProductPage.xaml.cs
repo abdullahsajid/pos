@@ -35,7 +35,12 @@ public partial class AddProductPage : ContentPage
         Debug.WriteLine($"Result: {result}");
         if (result > 0)
         {
-            //await GetCategory();
+            var vm = BindingContext as AddProductModel;
+            if (vm != null)
+            {
+                await vm.GetCategory();
+                await vm.GetProductCategory();
+            }
             categoryEntryField.Text = string.Empty;
         }
     }

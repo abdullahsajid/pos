@@ -1,4 +1,5 @@
-﻿using pos.Pages;
+using pos.Pages;
+
 namespace pos
 {
     public partial class AppShell : Shell

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui.Core;
+using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using pos.Data;
@@ -12,21 +12,60 @@ namespace pos.ViewModels
     {
         private readonly DB_Services _dbServices;
         private readonly IPopupService _popupService;
+        private List<Order> _allOrders = new();
+
         public OrderModel(DB_Services dbServices, IPopupService popupService)
         {
             _dbServices = dbServices;
             _popupService = popupService;
+            _selectedDate = DateTime.Today;
         }
 
         [ObservableProperty]
         private ObservableCollection<Order> _orders = new();
 
+        [ObservableProperty]
+        private DateTime _selectedDate;
+
+        [ObservableProperty]
+        private decimal _dailyTotal;
+
+        [ObservableProperty]
+        private int _dailyOrderCount;
+
+        [ObservableProperty]
+        private bool _isDailyView = true;
+
+        [ObservableProperty]
+        private bool _isMonthlyView = false;
+
+        async partial void OnSelectedDateChanged(DateTime value)
+        {
+            await FilterOrders();
+        }
+
+        [RelayCommand]
+        private async Task ShowDaily()
+        {
+            IsDailyView = true;
+            IsMonthlyView = false;
+            await FilterOrders();
+        }
+
+        [RelayCommand]
+        private async Task ShowMonthly()
+        {
+            IsDailyView = false;
+            IsMonthlyView = true;
+            await FilterOrders();
+        }
+
         public async Task InitializeAsync()
         {
-            Debug.WriteLine("InitializeAsync called");
             await _dbServices.initDatabase();
             await GetOrders();
         }
+
         public async Task GetOrders()
         {
             try
@@ -34,14 +73,39 @@ namespace pos.ViewModels
                 var orderList = await _dbServices.GetOrder();
                 if (orderList != null)
                 {
-                    Orders.Clear();
-                    Orders = new ObservableCollection<Order>(orderList);
+                    _allOrders = orderList.OrderByDescending(o => o.OrderDate).ToList();
+                    await FilterOrders();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                Debug.WriteLine($"Error: {ex.Message}");
             }
+        }
+
+        private async Task FilterOrders()
+        {
+            List<Order> filtered;
+            
+            if (IsDailyView)
+            {
+                filtered = _allOrders.Where(o => o.OrderDate.Date == SelectedDate.Date).ToList();
+            }
+            else // Monthly View
+            {
+                filtered = _allOrders.Where(o => o.OrderDate.Month == SelectedDate.Month && o.OrderDate.Year == SelectedDate.Year).ToList();
+            }
+            
+            Orders.Clear();
+            foreach (var order in filtered)
+            {
+                Orders.Add(order);
+            }
+
+            DailyTotal = filtered.Sum(o => o.TotalAmount);
+            DailyOrderCount = filtered.Count;
+            
+            await Task.CompletedTask;
         }
 
         [RelayCommand]
@@ -49,11 +113,7 @@ namespace pos.ViewModels
         {
             try
             {
-                if (order == null)
-                {
-                    Debug.WriteLine("ShowOrderItems: Selected order is null.");
-                    return;
-                }
+                if (order == null) return;
 
                 var orderItems = await _dbServices.GetOrderItems(order.Id);
 
@@ -64,28 +124,27 @@ namespace pos.ViewModels
                 }
 
                 StringBuilder message = new StringBuilder();
-                message.AppendLine($"Order #{order.Id}");
-                message.AppendLine($"Date: {order.OrderDate}");
-                message.AppendLine();
+                message.AppendLine($"Order #{order.OrderNumber}");
+                message.AppendLine($"Date: {order.OrderDate:dd-MMM-yyyy hh:mm tt}");
+                message.AppendLine("--------------------------");
                 message.AppendLine("Items:");
 
-                decimal total = 0;
                 foreach (var item in orderItems)
                 {
-                    message.AppendLine($"- {item.ProductName} (x{item.Quantity}): {item.UnitPrice * item.Quantity:C}");
-                    total += item.UnitPrice * item.Quantity;
+                    message.AppendLine($"- {item.ProductName} (x{item.Quantity}): Rs {item.UnitPrice * item.Quantity:N2}");
                 }
 
-                message.AppendLine();
-                message.AppendLine($"Total: {total:C}");
+                message.AppendLine("--------------------------");
+                message.AppendLine($"TOTAL: Rs {order.TotalAmount:N2}");
+                message.AppendLine($"PAID:  Rs {order.PaymentAmount:N2}");
+                message.AppendLine($"CHANGE: Rs {order.ChangeAmount:N2}");
 
                 await Shell.Current.DisplayAlert($"Order Details", message.ToString(), "Close");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error in ShowOrderItems: {ex.Message}");
-                Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
-                await Shell.Current.DisplayAlert("Error", $"Failed to show order items: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Failed to show order items", "OK");
             }
         }
     }

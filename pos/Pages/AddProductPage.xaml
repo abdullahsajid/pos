@@ -97,6 +97,16 @@
                         />
                     </VerticalStackLayout>
                     <VerticalStackLayout Spacing="2">
+                        <Label Style="{StaticResource lbl}" FontAttributes="Bold" Text="Product Key / Barcode" TextColor="Black"/>
+                        <Entry
+                            Placeholder="Enter Product Key"
+                            PlaceholderColor="Black"
+                            TextColor="Black"
+                            Style="{StaticResource txt}"
+                            Text="{Binding CurrentProduct.Barcode}"
+                        />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="2">
                         <Label Style="{StaticResource lbl}" FontAttributes="Bold" Text="Price" TextColor="Black"/>
                         <Entry
                             Placeholder="Enter Price"
@@ -117,6 +127,29 @@
                             Style="{StaticResource txt}"
                             Text="{Binding CurrentProduct.Description}"
                         />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Product Image" FontAttributes="Bold" Style="{StaticResource lbl}"/>
+                        <Grid ColumnDefinitions="Auto, *">
+                            <Frame Grid.Column="0" 
+                                   Padding="0" 
+                                   HasShadow="False" 
+                                   BorderColor="#DDD0C8" 
+                                   HeightRequest="100" 
+                                   WidthRequest="100" 
+                                   CornerRadius="10"
+                                   IsClippedToBounds="True">
+                                 <Image Source="{Binding SelectedImageSource}" Aspect="AspectFill" />
+                            </Frame>
+                            <Button Grid.Column="1" 
+                                    Text="Select Image" 
+                                    Command="{Binding PickImageCommand}" 
+                                    Margin="10,0" 
+                                    VerticalOptions="Center"
+                                    BackgroundColor="#753F21"
+                                    TextColor="White"
+                                    CornerRadius="5"/>
+                        </Grid>
                     </VerticalStackLayout>
                     <Grid ColumnDefinitions="*,*">
                         <Button
@@ -171,19 +204,26 @@
                                                BackgroundColor="Transparent" 
                                                TextColor="Black" 
                                             /> 
-                                            <HorizontalStackLayout HorizontalOptions="Center">
-                                                <Button 
-                                                    ImageSource="check.png" 
-                                                    BackgroundColor="Transparent"
-                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UpdateCategoriesCommand}"
-                                                    CommandParameter="{Binding .}"
-                                                />
-                                                <Button 
-                                                    ImageSource="delete.png"                   
-                                                    BackgroundColor="Transparent"
-                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteCategoryCommand}"
-                                                    CommandParameter="{Binding .}"
-                                                />
+                                            <HorizontalStackLayout HorizontalOptions="Center" Spacing="15" Margin="0,5">
+                                                <!-- Custom Check Button -->
+                                                <Border HeightRequest="30" WidthRequest="30" StrokeShape="RoundRectangle 15" BackgroundColor="Green" StrokeThickness="0">
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer 
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UpdateCategoriesCommand}"
+                                                            CommandParameter="{Binding .}"/>
+                                                    </Border.GestureRecognizers>
+                                                    <Label Text="✓" TextColor="White" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" />
+                                                </Border>
+
+                                                <!-- Custom Delete Button -->
+                                                <Border HeightRequest="30" WidthRequest="30" StrokeShape="RoundRectangle 15" BackgroundColor="#DC3545" StrokeThickness="0">
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer 
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteCategoryCommand}"
+                                                            CommandParameter="{Binding .}"/>
+                                                    </Border.GestureRecognizers>
+                                                    <Label Text="✕" TextColor="White" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" />
+                                                </Border>
                                             </HorizontalStackLayout>
                                         </VerticalStackLayout>
                                     </Border>
@@ -238,10 +278,12 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-            <Grid Grid.Row="1" ColumnDefinitions="*,*,Auto" BackgroundColor="#A67B5B" Padding="10" Margin="0,20,0,0">
-                    <Label Text="Name" Grid.Column="0" TextColor="White" FontAttributes="Bold" FontSize="16" />
-                    <Label Text="Price (Rs)" Grid.Column="1" TextColor="White" FontAttributes="Bold" FontSize="16" />
-                    <Label Text="Actions" Grid.Column="2" TextColor="White" FontAttributes="Bold" FontSize="16" />
+            <Grid Grid.Row="1" ColumnDefinitions="60,*,80,100,Auto" BackgroundColor="#A67B5B" Padding="10" Margin="0,20,0,0">
+                    <Label Text="Img" Grid.Column="0" TextColor="White" FontAttributes="Bold" FontSize="14" />
+                    <Label Text="Name" Grid.Column="1" TextColor="White" FontAttributes="Bold" FontSize="14" />
+                    <Label Text="Key" Grid.Column="2" TextColor="White" FontAttributes="Bold" FontSize="14" />
+                    <Label Text="Price" Grid.Column="3" TextColor="White" FontAttributes="Bold" FontSize="14" />
+                    <Label Text="Actions" Grid.Column="4" TextColor="White" FontAttributes="Bold" FontSize="14" Margin="0,0,20,0"/>
             </Grid>
             <CollectionView Grid.Row="2" 
                                 x:Name="ProductListView"
@@ -249,19 +291,36 @@
                       >
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="data:ProductItem">
-                        <Grid ColumnDefinitions="*,*,Auto" Padding="10" BackgroundColor="Transparent">
-                            <Frame Grid.ColumnSpan="3" BackgroundColor="Transparent" BorderColor="#DDD0C8" Padding="0" Margin="0" HasShadow="False" />
+                        <Grid ColumnDefinitions="60,*,80,100,Auto" Padding="10" BackgroundColor="Transparent" VerticalOptions="Center">
+                            <Frame Grid.ColumnSpan="5" BackgroundColor="Transparent" BorderColor="#DDD0C8" Padding="0" Margin="0" HasShadow="False" />
 
+                            <!-- Clickable Thumbnail for Update -->
+                            <Border Grid.Column="0" HeightRequest="45" WidthRequest="45" StrokeShape="RoundRectangle 8" 
+                                    BackgroundColor="#F8F9FA" Stroke="#DDD0C8" Padding="0" HorizontalOptions="Center">
+                                <Grid>
+                                    <Label Text="+" TextColor="#753F21" HorizontalOptions="Center" VerticalOptions="Center" FontSize="20" />
+                                    <Image Source="{Binding ImagePath}" Aspect="AspectFill" />
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.PickImageForUpdateCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                </Border.GestureRecognizers>
+                            </Border>
 
-                            <Entry Text="{Binding Name}" Grid.Column="0" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
+                            <Entry Text="{Binding Name}" Grid.Column="1" FontSize="14" BackgroundColor="Transparent" TextColor="Black" VerticalOptions="Center" />
 
+                            <Entry Text="{Binding Barcode}" Grid.Column="2" FontSize="14" BackgroundColor="Transparent" TextColor="Black" VerticalOptions="Center" />
 
-                            <Entry Text="{Binding Price}" Grid.Column="1" FontSize="16" Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" />
-                            <HorizontalStackLayout Grid.Column="2" Spacing="5" HorizontalOptions="End">
+                            <Entry Text="{Binding Price}" Grid.Column="3" FontSize="14" Keyboard="Numeric" BackgroundColor="Transparent" TextColor="Black" VerticalOptions="Center" />
+                            
+                            <HorizontalStackLayout Grid.Column="4" Spacing="5" HorizontalOptions="End" VerticalOptions="Center">
                                 <Button
                                     Text="Update"
                                     BackgroundColor="Green"
                                     TextColor="White"
+                                    FontSize="12"
+                                    HeightRequest="35"
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UpdateItemCommand}"
                                     CommandParameter="{Binding .}"
                                 />
@@ -269,6 +328,8 @@
                                     Text="Del"
                                     BackgroundColor="Red"
                                     TextColor="White"
+                                    FontSize="12"
+                                    HeightRequest="35"
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteProductsCommand}"
                                     CommandParameter="{Binding .}" />
                             </HorizontalStackLayout>

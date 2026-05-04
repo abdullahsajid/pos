@@ -21,8 +21,14 @@ public partial class OrderPage : ContentPage
     {
         if (e.CurrentSelection.FirstOrDefault() is Order selectedOrder)
         {
-            Debug.WriteLine($"Selected Order: {selectedOrder.OrderNumber}");
             await _viewModel.ShowOrderItemsCommand.ExecuteAsync(selectedOrder);
+            ((CollectionView)sender).SelectedItem = null;
         }
+    }
+
+    private void OnChangeMonthClicked(object sender, EventArgs e)
+    {
+        // On Windows, focusing the DatePicker will open the picker dialog
+        DatePickerField.Focus();
     }
 }

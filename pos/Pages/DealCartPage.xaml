@@ -13,7 +13,8 @@
              x:DataType="vm:DealCartModel"
              >
     <Grid ColumnDefinitions=".40*, .60*">
-        <Grid Grid.Column="0" Margin="20" RowDefinitions="Auto, Auto, *, Auto, Auto" BackgroundColor="White">
+        <!-- Sidebar - Shopping Cart Section -->
+        <Grid Grid.Column="0" Margin="20" RowDefinitions="Auto, Auto, *, Auto" BackgroundColor="White">
             <SearchBar 
                 Grid.Row="0"
                 Placeholder="Search items in cart..." 
@@ -23,300 +24,100 @@
                 TextColor="Black"
                 Margin="0,0,0,10" 
             />
-            <Frame Grid.Row="1" IsVisible="{Binding IsSearchActive}" Padding="10" ZIndex="999" BackgroundColor="#FAFAFA" BorderColor="#E0E0E0" Margin="0,0,0,10">
-                <VerticalStackLayout Spacing="10">
-                    <CollectionView  SelectionMode="Single" ItemsSource="{Binding DealsItems}"
-                        HeightRequest="200">
-                        <CollectionView.ItemsLayout>
-                            <GridItemsLayout Orientation="Vertical" Span="1" />
-                        </CollectionView.ItemsLayout>
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="data:ProductItem">
-                                <Grid Padding="10" ColumnDefinitions="*, Auto, Auto" RowDefinitions="Auto, Auto">
-                                    <Grid.GestureRecognizers>
-                                        <TapGestureRecognizer
-                                            Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.AddToCartCommand}"
-                                            CommandParameter="{Binding .}"
-                                        />
-                                    </Grid.GestureRecognizers>
-                                    <Label Grid.Column="0" Grid.Row="0" Text="{Binding Name}" FontAttributes="Bold" TextColor="Black"/>
-                                    <Label 
-                                        Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" 
-                                        Text="{Binding Price, StringFormat='{0:C}'}"
-                                        VerticalOptions="Center" TextColor="#753F21" FontAttributes="Bold"/>
-                                </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </VerticalStackLayout>
-            </Frame>
+            
             <VerticalStackLayout Grid.Row="1" Spacing="0">
-                <Grid Padding="8" BackgroundColor="#753F21">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150" />
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition Width="80" />
-                        <ColumnDefinition Width="100" />
-                    </Grid.ColumnDefinitions>
-                    <Label Grid.Column="0" Text="Name" TextColor="White" FontAttributes="Bold" Padding="10" />
-                    <Label Grid.Column="1" Text="Qty" TextColor="White" FontAttributes="Bold" Padding="10" />
-                    <Label Grid.Column="2" Text="Price" TextColor="White" FontAttributes="Bold" Padding="10" />
-                    <Label Grid.Column="3" Text="Total" TextColor="White" FontAttributes="Bold" Padding="10" />
+                <Grid Padding="8" BackgroundColor="#753F21" ColumnDefinitions="*, 80, 80, 80, 40">
+                    <Label Grid.Column="0" Text="Name" TextColor="White" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Column="1" Text="Qty" TextColor="White" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalOptions="Center"/>
+                    <Label Grid.Column="2" Text="Price" TextColor="White" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalOptions="Center"/>
+                    <Label Grid.Column="3" Text="Total" TextColor="White" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalOptions="Center"/>
                 </Grid>
-                <BoxView HeightRequest="1" BackgroundColor="#E0E0E0" VerticalOptions="End" />
+                <BoxView HeightRequest="1" BackgroundColor="#E0E0E0" />
             </VerticalStackLayout>
-            <ScrollView Grid.Row="2" VerticalScrollBarVisibility="Always">
-                <CollectionView  ItemsSource="{Binding CartItems}"
-                   VerticalOptions="Fill"
-                   HorizontalOptions="Fill">
+
+            <!-- Cart Items List -->
+            <ScrollView Grid.Row="2">
+                <CollectionView ItemsSource="{Binding CartItems}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:CartModel">
-                            <Grid Padding="20" RowSpacing="0" ColumnSpacing="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="150" />
-                                    <ColumnDefinition Width="100" />
-                                    <ColumnDefinition Width="80" />
-                                    <ColumnDefinition Width="100" />
-                                    <ColumnDefinition Width="100" />
-                                </Grid.ColumnDefinitions>
-                                <Label Grid.Column="0" Text="{Binding Name}" TextColor="Black" Padding="10" />
-                                <Entry 
-                                    Grid.Column="1"
-                                    Text="{Binding Quantity, Mode=TwoWay}"
-                                    TextColor="Black"
-                                    Keyboard="Numeric"
-                                    HorizontalTextAlignment="Center"
-                                    WidthRequest="60"
-                                />
-                                <Label Grid.Column="2" Text="{Binding Price, StringFormat='{0:C}'}" Padding="10" TextColor="Black" HorizontalTextAlignment="Center" />
-                                <Label Grid.Column="3" Text="{Binding Total, StringFormat='{0:C}'}" Padding="10" TextColor="Black" HorizontalTextAlignment="End" />
-                                <ImageButton
-                                    Source="cross.png"
-                                    Grid.Column="4"
-                                    Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.RemoveFromCartCommand}"
-                                    CommandParameter="{Binding .}"
-                                    ToolTipProperties.Text="Remove item from cart"
-                                    HorizontalOptions="End"
-                                    VerticalOptions="Start"
-                                    HeightRequest="10"
-                                    WidthRequest="10"
-                                />
-                                <BoxView Grid.ColumnSpan="5" HeightRequest="1" BackgroundColor="#E0E0E0" VerticalOptions="End" />
+                            <Grid Padding="10" ColumnDefinitions="*, 80, 80, 80, 40">
+                                <Label Grid.Column="0" Text="{Binding Name}" TextColor="Black" VerticalOptions="Center" LineBreakMode="WordWrap"/>
+                                <Entry Grid.Column="1" Text="{Binding Quantity, Mode=TwoWay}" TextColor="Black" Keyboard="Numeric" HorizontalTextAlignment="Center" WidthRequest="50" HeightRequest="40" VerticalOptions="Center"/>
+                                <Label Grid.Column="2" Text="{Binding Price}" TextColor="Black" HorizontalTextAlignment="Center" VerticalOptions="Center"/>
+                                <Label Grid.Column="3" Text="{Binding Total}" TextColor="Black" HorizontalTextAlignment="Center" VerticalOptions="Center"/>
+                                <ImageButton Grid.Column="4" Source="cross.png" WidthRequest="25" HeightRequest="25" Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveFromCartCommand}" CommandParameter="{Binding .}" VerticalOptions="Center"/>
+                                <BoxView Grid.Row="1" Grid.ColumnSpan="5" HeightRequest="1" BackgroundColor="#E0E0E0" VerticalOptions="End" />
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </ScrollView>
-            <VerticalStackLayout Grid.Row="3">
-                <Border Padding="5, 10" Margin="10" StrokeShape="RoundRectangle 10">
-                    <Grid RowDefinitions="Auto, Auto, Auto, Auto">
-                        <Label 
-                            Grid.Row="0"
-                            Grid.Column="0"
-                            Text="Address:" 
-                            FontSize="16"
-                            TextColor="Black" 
-                        />
-                        <Entry
-                            Grid.Row="1"
-                            Grid.Column="0"
-                            FontSize="22"
-                            Text="{Binding Address}"
-                            Keyboard="Numeric"
-                            HorizontalTextAlignment="Start"
-                            TextColor="Black"
-                        />
-                        <Label 
-                            Grid.Row="2"
-                            Grid.Column="0"
-                            Text="Phone No:" 
-                            FontSize="16"
-                            TextColor="Black" 
-                        />
-                        <Entry
-                            Grid.Row="3"
-                            Grid.Column="0"
-                            FontSize="22"
-                            Text="{Binding Phone}"
-                            Keyboard="Numeric"
-                            HorizontalTextAlignment="Start"
-                            TextColor="Black"
-                        />
-                    </Grid>
-                </Border>
-            </VerticalStackLayout>
-            <VerticalStackLayout Grid.Row="4">
-                <Border Padding="5, 10" Margin="10" StrokeShape="RoundRectangle 10">
-                    <Grid RowDefinitions="Auto, Auto, Auto, Auto"
-                            ColumnDefinitions="2*, 3*">
-                        <Label 
-                            Grid.Row="0"
-                            Grid.Column="0"
-                            Text="Payment" 
-                            FontSize="22"
-                            TextColor="Black" 
-                        />
-                        <Entry
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            FontSize="22"
-                            Text="{Binding Payment, StringFormat='{0:C}'}"
-                            Keyboard="Numeric"
-                            HorizontalTextAlignment="Center"
-                            TextColor="Black"
-                        />
-                        <Label 
-                            Grid.Row="1"
-                            Grid.Column="0"
-                            Text="Change" 
-                            FontSize="22"
-                            TextColor="Black" 
-                        />
-                        <Label 
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            FontSize="22"
-                            Text="{Binding Change, StringFormat='{0:C}'}"  
-                            TextColor="Black" 
-                            HorizontalTextAlignment="Center"
-                        />
-                        <Label 
-                            Grid.Row="2"
-                            Grid.Column="0"
-                            Text="Total" 
-                            FontSize="23"
-                            TextColor="Black"
-                            FontAttributes="Bold"
-                        />
-                        <Label 
-                            Grid.Row="2"
-                            Grid.Column="1"
-                            FontSize="23"
-                            Text="{Binding Total, StringFormat='{0:C}'}"  
-                            TextColor="Black" 
-                            HorizontalTextAlignment="Center"
-                            FontAttributes="Bold"
-                        />
-                        <Button 
-                            Grid.Row="3"
-                            Grid.Column="1"
-                            Margin="10"
-                            Text="Print" 
-                            BackgroundColor="Green" 
-                            TextColor="White" 
-                            CornerRadius="10" 
-                            Command="{Binding PrintInvoiceCommand}"
-                            CommandParameter="{Binding .}"
-                        />
-                    </Grid>
-                </Border>
-            </VerticalStackLayout>
+
+            <!-- Totals Section -->
+            <Border Grid.Row="3" Padding="15" Margin="0,10,0,0" StrokeShape="RoundRectangle 10" Stroke="#E0E0E0">
+                <Grid RowDefinitions="Auto, Auto, Auto, Auto" ColumnDefinitions="*, Auto" RowSpacing="10">
+                    <Label Text="Payment" FontSize="20" TextColor="Black" Grid.Row="0" Grid.Column="0" VerticalOptions="Center"/>
+                    <Entry Text="{Binding Payment, Mode=TwoWay}" FontSize="20" TextColor="Black" Grid.Row="0" Grid.Column="1" WidthRequest="150" HorizontalTextAlignment="End" Keyboard="Numeric"/>
+                    
+                    <Label Text="Change" FontSize="20" TextColor="Black" Grid.Row="1" Grid.Column="0"/>
+                    <Label Text="{Binding Change}" FontSize="20" TextColor="Black" Grid.Row="1" Grid.Column="1" HorizontalTextAlignment="End"/>
+                    
+                    <Label Text="Total" FontSize="22" FontAttributes="Bold" TextColor="Black" Grid.Row="2" Grid.Column="0"/>
+                    <Label Text="{Binding Total, StringFormat='Rs {0:N0}'}" FontSize="22" FontAttributes="Bold" TextColor="#753F21" Grid.Row="2" Grid.Column="1" HorizontalTextAlignment="End"/>
+                    
+                    <Button Grid.Row="3" Grid.ColumnSpan="2" Text="PRINT INVOICE" BackgroundColor="Green" TextColor="White" FontAttributes="Bold" HeightRequest="50" CornerRadius="10" Command="{Binding PrintInvoiceCommand}"/>
+                </Grid>
+            </Border>
         </Grid>
-        <Grid Grid.Column="1" RowDefinitions="Auto, Auto, Auto, *" RowSpacing="10">
-            <CollectionView Grid.Row="1" x:Name="CategoryListView" ItemsSource="{Binding Categories}" HorizontalOptions="Center" HorizontalScrollBarVisibility="Default">
+
+        <!-- Right Side - Product Selection -->
+        <Grid Grid.Column="1" RowDefinitions="Auto, Auto, *" RowSpacing="10" Margin="0,20,20,20">
+            <!-- Categories -->
+            <CollectionView Grid.Row="0" ItemsSource="{Binding Categories}">
                 <CollectionView.ItemsLayout>
-                    <LinearItemsLayout ItemSpacing="10" Orientation="Horizontal"/>
+                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:CategoryModel">
-                        <Border Padding="20,10"
-                            StrokeThickness="2"
-                            StrokeShape="RoundRectangle 10"
-                            BackgroundColor="#FFF3EA"
-                            Stroke="White"
-                            >
-                            <HorizontalStackLayout Spacing="5">
-                                <Label Text="{Binding Name}" TextColor="#753F21">
-                                    <Label.Triggers>
-                                        <DataTrigger
-                                            Binding="{Binding IsSelected}"
-                                            TargetType="Label"
-                                            Value="True"
-                                        >
-                                            <Setter Property="TextColor" Value="White"/>
-                                        </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
-                            </HorizontalStackLayout>
-                            <Border.Triggers>
-                                <DataTrigger
-                                    Binding="{Binding IsSelected}"
-                                    TargetType="Border"
-                                    Value="True"
-                                >
-                                    <Setter Property="BackgroundColor" Value="#753F21"/>
-                                </DataTrigger>
-                            </Border.Triggers>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer 
-                                    Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.SelectCategoryCommand}"
-                                    CommandParameter="{Binding .}"/>
-                            </Border.GestureRecognizers>
+                        <Border Padding="20,10" StrokeShape="RoundRectangle 10" BackgroundColor="#FFF3EA" Stroke="#753F21">
+                             <Border.Triggers>
+                                 <DataTrigger Binding="{Binding IsSelected}" TargetType="Border" Value="True">
+                                     <Setter Property="BackgroundColor" Value="#753F21"/>
+                                 </DataTrigger>
+                             </Border.Triggers>
+                             <Label Text="{Binding Name}" TextColor="#753F21">
+                                 <Label.Triggers>
+                                     <DataTrigger Binding="{Binding IsSelected}" TargetType="Label" Value="True">
+                                         <Setter Property="TextColor" Value="White"/>
+                                     </DataTrigger>
+                                 </Label.Triggers>
+                             </Label>
+                             <Border.GestureRecognizers>
+                                 <TapGestureRecognizer Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectCategoryCommand}" CommandParameter="{Binding .}"/>
+                             </Border.GestureRecognizers>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-            <SearchBar 
-                Grid.Row="2"
-                Placeholder="Search items..." 
-                TextChanged="OnSearchProductDealItems"
-                CancelButtonColor="Gray"
-                PlaceholderColor="Gray"
-                TextColor="Black"
-                Margin="0,0,0,10" 
-                BackgroundColor="#FFF"
-            />
-            <Grid Grid.Row="3" RowDefinitions="Auto, Auto, Auto">
-                <CollectionView Grid.Row="0" x:Name="ProductListView" ItemsSource="{Binding ProductItem}" IsVisible="{Binding HasDeals}" VerticalOptions="Center">
-                    <CollectionView.ItemsLayout>
-                        <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="data:ProductItem">
-                            <Border Padding="20,10"
-                                StrokeThickness="1"
-                                StrokeShape="RoundRectangle 10"
-                            >
-                                <VerticalStackLayout Spacing="5">
-                                    <Label Text="{Binding Name}" TextColor="black" FontSize="18"/>
-                                    <Label Text="{Binding Price}" FontSize="24" TextColor="black"/>
-                                    <Button Text="Add to cart" 
-                                        BackgroundColor="#753F21" 
-                                        TextColor="White" 
-                                        CornerRadius="10" 
-                                        Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.AddToCartCommand}"
-                                        CommandParameter="{Binding .}"/>
-                                </VerticalStackLayout>
 
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-                <CollectionView Grid.Row="1"  ItemsSource="{Binding SearchProductsItems}" IsVisible="{Binding HasProducts}" VerticalOptions="Center">
-                    <CollectionView.ItemsLayout>
-                        <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="data:SearchResult">
-                            <Border Padding="20,10"
-                                    StrokeThickness="1"
-                                    StrokeShape="RoundRectangle 10"
-                                >
-                                <VerticalStackLayout Spacing="5">
-                                    <Label Text="{Binding Name}" TextColor="black" FontSize="18"/>
-                                    <Label Text="{Binding Price}" FontSize="24" TextColor="black"/>
-                                    <Button Text="Add to cart" 
-                                        BackgroundColor="#753F21" 
-                                        TextColor="White" 
-                                        CornerRadius="10" 
-                                        Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}} ,Path=BindingContext.AddToCartCommand}"
-                                        CommandParameter="{Binding .}"/>
-                                </VerticalStackLayout>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </Grid>
+            <SearchBar Grid.Row="1" Placeholder="Search products..." TextChanged="OnSearchProductDealItems" BackgroundColor="White"/>
+
+            <CollectionView Grid.Row="2" ItemsSource="{Binding ProductItem}">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="data:ProductItem">
+                        <Border Padding="15" StrokeShape="RoundRectangle 10" BackgroundColor="White" Stroke="#E0E0E0">
+                            <Grid RowDefinitions="Auto, Auto, *" RowSpacing="5">
+                                <Label Grid.Row="0" Text="{Binding Name}" TextColor="Black" FontSize="18" MaxLines="2" LineBreakMode="WordWrap"/>
+                                <Label Grid.Row="1" Text="{Binding Price, StringFormat='Rs {0:N0}'}" FontSize="22" FontAttributes="Bold" TextColor="#753F21"/>
+                                <Button Grid.Row="2" Text="Add to cart" BackgroundColor="#753F21" TextColor="White" HeightRequest="45" CornerRadius="10" VerticalOptions="End" Command="{Binding Source={x:RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AddToCartCommand}" CommandParameter="{Binding .}"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </Grid>
     </Grid>
 </ContentPage>

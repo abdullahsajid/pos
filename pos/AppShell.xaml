@@ -5,51 +5,65 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:pos"
     xmlns:pages="clr-namespace:pos.Pages"
-    Shell.FlyoutBehavior="Locked"
     Shell.FlyoutBackgroundColor="White"
-    Shell.FlyoutWidth="60"
+    Shell.FlyoutWidth="180"
     Title="pos">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Icon="home.png"
-        Route="MainPage"
-    />
+    <Shell.ItemTemplate>
+        <DataTemplate>
+            <Grid HeightRequest="50" Padding="20,0">
+                <HorizontalStackLayout Spacing="15" VerticalOptions="Center">
+                    <!-- Icon Slot (using standard Icon binding) -->
+                    <Image Source="{Binding Icon}"
+                           HeightRequest="22"
+                           WidthRequest="22"
+                           VerticalOptions="Center" />
+                    
+                    <!-- Text: Explicitly Black for visibility on White background -->
+                    <Label Text="{Binding Title}"
+                           TextColor="Black"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
 
-    <ShellContent
-        Title="Product"
-        ContentTemplate="{DataTemplate pages:AddProductPage}"
-        Icon="add_items.png"
-        Route="AddProductPage" 
-    />
+    <FlyoutItem Title="Home" Icon="home">
+        <ShellContent
+            ContentTemplate="{DataTemplate local:MainPage}"
+            Route="MainPage" />
+    </FlyoutItem>
 
-    <ShellContent
-        Title="Order"
-        ContentTemplate="{DataTemplate pages:OrderPage}"
-        Icon="clipboard.png"
-        Route="OrderPage"
-    />
+    <FlyoutItem Title="Product" Icon="add_items">
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:AddProductPage}"
+            Route="AddProductPage" />
+    </FlyoutItem>
 
-    <ShellContent
-        Title="Deal Cart"
-        ContentTemplate="{DataTemplate pages:DealCartPage}"
-        Icon="add_to_cart.png"
-        Route="DealCartPage"
-    />
+    <FlyoutItem Title="Order" Icon="clipboard">
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:OrderPage}"
+            Route="OrderPage" />
+    </FlyoutItem>
 
-    <ShellContent
-        Title="Deals"
-        ContentTemplate="{DataTemplate pages:AddDealPage}"
-        Icon="grid.png"
-        Route="AddDealPage"
-     />
+    <FlyoutItem Title="Deal Cart" Icon="add_to_cart">
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:DealCartPage}"
+            Route="DealCartPage" />
+    </FlyoutItem>
 
-    <ShellContent
-        Title="Settings"
-        ContentTemplate="{DataTemplate pages:SettingPage}"
-        Icon="settings.png"
-        Route="SettingPage"
-     />
+    <FlyoutItem Title="Deals" Icon="grid">
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:AddDealPage}"
+            Route="AddDealPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Settings" Icon="settings">
+        <ShellContent
+            ContentTemplate="{DataTemplate pages:SettingPage}"
+            Route="SettingPage" />
+    </FlyoutItem>
 
 </Shell>

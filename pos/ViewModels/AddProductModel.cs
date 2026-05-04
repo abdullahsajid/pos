@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using pos.Data;
 using pos.Models;
@@ -152,6 +152,62 @@ namespace pos.ViewModels
             }
         }
 
+        [ObservableProperty]
+        private ImageSource _selectedImageSource;
+
+        private string _tempImagePath;
+
+        [RelayCommand]
+        private async Task PickImageAsync()
+        {
+            try
+            {
+                var result = await FilePicker.PickAsync(new PickOptions
+                {
+                    PickerTitle = "Select Product Image",
+                    FileTypes = FilePickerFileType.Images
+                });
+
+                if (result != null)
+                {
+                    _tempImagePath = result.FullPath;
+                    SelectedImageSource = ImageSource.FromFile(_tempImagePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", "Could not pick image: " + ex.Message, "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task PickImageForUpdateAsync(ProductItem product)
+        {
+            try
+            {
+                var result = await FilePicker.PickAsync(new PickOptions
+                {
+                    PickerTitle = "Change Product Image",
+                    FileTypes = FilePickerFileType.Images
+                });
+
+                if (result != null)
+                {
+                    // Copy to local app storage for persistence
+                    string fileName = $"prod_{DateTime.Now.Ticks}{Path.GetExtension(result.FullPath)}";
+                    string localPath = Path.Combine(FileSystem.AppDataDirectory, fileName);
+                    File.Copy(result.FullPath, localPath, true);
+
+                    // Update ImagePath - UI will refresh instantly
+                    product.ImagePath = localPath;
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", "Could not change image: " + ex.Message, "OK");
+            }
+        }
+
         [RelayCommand]
         private async void SaveProduct()
         {
@@ -167,23 +223,46 @@ namespace pos.ViewModels
                     await Shell.Current.DisplayAlert("Error", "Please fill all fields", "OK");
                     return;
                 }
+
+                string finalImagePath = string.Empty;
+                if (!string.IsNullOrEmpty(_tempImagePath))
+                {
+                    // Copy to local app storage for persistence
+                    string fileName = $"prod_{DateTime.Now.Ticks}{Path.GetExtension(_tempImagePath)}";
+                    finalImagePath = Path.Combine(FileSystem.AppDataDirectory, fileName);
+                    File.Copy(_tempImagePath, finalImagePath, true);
+                }
+
                 var newProduct = new ProductItem
                 {
                     Name = CurrentProduct.Name,
+                    Barcode = CurrentProduct.Barcode,
                     Price = CurrentProduct.Price,
                     Description = CurrentProduct.Description,
-                    CategoryId = ProductCategory.Id
+                    CategoryId = ProductCategory.Id,
+                    ImagePath = finalImagePath
                 };
                 var result = await _dbServices.AddProduct(newProduct);
                 if (result > 0)
                 {
                     CurrentProduct = new ProductItem();
+                    SelectedImageSource = null;
+                    _tempImagePath = null;
+
+                    // Sync the list view category with the one we just saved to
+                    var targetCategory = Categories.FirstOrDefault(c => c.Id == ProductCategory.Id);
+                    if (targetCategory != null)
+                    {
+                        // Unselect current
+                        if (SelectedCategory != null)
+                            SelectedCategory.IsSelected = false;
+
+                        // Select new
+                        targetCategory.IsSelected = true;
+                        SelectedCategory = targetCategory;
+                    }
 
                     await GetProducts();
-                    //foreach (var category in AddProductCategory)
-                    //{
-                    //    category.IsSelected = false;
-                    //}
                 }
             }
             catch (Exception ex)

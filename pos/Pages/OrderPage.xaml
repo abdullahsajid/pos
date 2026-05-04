@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="pos.Pages.OrderPage"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             Title="Orders"
+             Title="Sales Reports"
              Shell.NavBarIsVisible="True"
              Shell.BackgroundColor="#FFF3EA"
              Shell.TitleColor="#753F21"
@@ -13,38 +13,78 @@
              xmlns:vm="clr-namespace:pos.ViewModels"
              x:DataType="vm:OrderModel"
              >
-    <Grid RowDefinitions="Auto, *">
-        <Grid Grid.Row="0" ColumnDefinitions="*,*,*,*,*"  BackgroundColor="#A67B5B" Padding="10">
-            <Label Text="Order#" Grid.Column="0" TextColor="White" FontAttributes="Bold" FontSize="16" />
-            <Label Text="Date" Grid.Column="1" TextColor="White" FontAttributes="Bold" FontSize="16" />
-            <Label Text="Totol Amount" Grid.Column="2" TextColor="White" FontAttributes="Bold" FontSize="16" />
-            <Label Text="Payment Amount" Grid.Column="3" TextColor="White" FontAttributes="Bold" FontSize="16" />
-            <Label Text="Change Amount" Grid.Column="4" TextColor="White" FontAttributes="Bold" FontSize="16" />
+    <Grid RowDefinitions="Auto, Auto, *">
+        <!-- Summary Header with Tabs -->
+        <VerticalStackLayout Grid.Row="0">
+            <Border Margin="10" Padding="15" BackgroundColor="White" StrokeShape="RoundRectangle 10" StrokeThickness="0">
+                <VerticalStackLayout Spacing="15">
+                    <!-- Metrics Row -->
+                    <HorizontalStackLayout Spacing="30" HorizontalOptions="Center">
+                        <VerticalStackLayout>
+                            <Label Text="TOTAL SALES" FontSize="11" TextColor="Gray" HorizontalOptions="Center"/>
+                            <Label Text="{Binding DailyTotal, StringFormat='Rs {0:N0}'}" FontSize="24" FontAttributes="Bold" TextColor="#753F21" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                        <BoxView WidthRequest="1" BackgroundColor="#DDD0C8" HeightRequest="40"/>
+                        <VerticalStackLayout>
+                            <Label Text="ORDER COUNT" FontSize="11" TextColor="Gray" HorizontalOptions="Center"/>
+                            <Label Text="{Binding DailyOrderCount}" FontSize="24" FontAttributes="Bold" TextColor="#753F21" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                        <BoxView WidthRequest="1" BackgroundColor="#DDD0C8" HeightRequest="40"/>
+                        <VerticalStackLayout WidthRequest="200">
+                             <Label Text="SELECT VIEW" FontSize="11" TextColor="Gray" HorizontalOptions="Center"/>
+                             <HorizontalStackLayout HorizontalOptions="Center" Spacing="0">
+                                <Button Text="Daily" 
+                                        Command="{Binding ShowDailyCommand}"
+                                        BackgroundColor="{Binding IsDailyView, Converter={StaticResource ColorConverter}}"
+                                        TextColor="White" HeightRequest="40" WidthRequest="100" CornerRadius="8" Padding="0"/>
+                                <Button Text="Monthly" 
+                                        Command="{Binding ShowMonthlyCommand}"
+                                        BackgroundColor="{Binding IsMonthlyView, Converter={StaticResource ColorConverter}}"
+                                        TextColor="White" HeightRequest="40" WidthRequest="90" CornerRadius="8" Margin="5,0,0,0" Padding="0"/>
+                             </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+
+                    <!-- Filter Row -->
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
+                        <Label Text="Filter Date:" VerticalOptions="Center" TextColor="Gray"/>
+                        
+                        <!-- Simple DatePicker that handles everything -->
+                        <DatePicker x:Name="DatePickerField"
+                                    Date="{Binding SelectedDate}" 
+                                    Format="D" 
+                                    TextColor="Black" 
+                                    MinimumWidthRequest="220"
+                                    VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*,*"  BackgroundColor="#A67B5B" Padding="10" Margin="10,0">
+            <Label Text="Ref#" Grid.Column="0" TextColor="White" FontAttributes="Bold" FontSize="16" />
+            <Label Text="Date/Time" Grid.Column="1" TextColor="White" FontAttributes="Bold" FontSize="16" />
+            <Label Text="Total (Rs)" Grid.Column="2" TextColor="White" FontAttributes="Bold" FontSize="16" />
+            <Label Text="Paid" Grid.Column="3" TextColor="White" FontAttributes="Bold" FontSize="16" />
+            <Label Text="Change" Grid.Column="4" TextColor="White" FontAttributes="Bold" FontSize="16" />
         </Grid>
-        <CollectionView Grid.Row="1" 
+
+        <CollectionView Grid.Row="2" 
            ItemsSource="{Binding Orders}"
            SelectionMode="Single"
            SelectionChanged="OnSelectionChanged"
+           Margin="10,0,10,10"
         >
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="data:Order">
-                    <Grid ColumnDefinitions="*,*,*,*,*" RowDefinitions="Auto,Auto" Padding="10" BackgroundColor="Transparent">
-                        <Label Text="{Binding OrderNumber}" Grid.Column="0" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
-                        <Label Text="{Binding OrderDate, StringFormat='{0:dd/MM/yyyy}'}" Grid.Column="1" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
-                        <Label Text="{Binding TotalAmount}" Grid.Column="2" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
-                        <Label Text="{Binding PaymentAmount}" Grid.Column="3" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
-                        <Label Text="{Binding ChangeAmount}" Grid.Column="4" FontSize="16" BackgroundColor="Transparent" TextColor="Black" />
-                        <Border Grid.Row="1" 
-                            Grid.ColumnSpan="5" 
-                            Stroke="#DDD0C8" 
-                            StrokeThickness="2" 
-                            Margin="0,5,0,0" 
-                            HeightRequest="2" 
-                            HorizontalOptions="FillAndExpand">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="0" />
-                            </Border.StrokeShape>
-                        </Border>
+                    <Grid ColumnDefinitions="*,*,*,*,*" RowDefinitions="Auto,Auto" Padding="10" BackgroundColor="White">
+                        <Label Text="{Binding OrderNumber}" Grid.Column="0" FontSize="15" TextColor="Black" VerticalOptions="Center" />
+                        <Label Text="{Binding OrderDate, StringFormat='{0:dd MMM yyyy, hh:mm tt}'}" Grid.Column="1" FontSize="14" TextColor="Black" VerticalOptions="Center" />
+                        <Label Text="{Binding TotalAmount, StringFormat='{0:N2}'}" Grid.Column="2" FontSize="15" TextColor="Black" VerticalOptions="Center" />
+                        <Label Text="{Binding PaymentAmount, StringFormat='{0:N2}'}" Grid.Column="3" FontSize="15" TextColor="Black" VerticalOptions="Center" />
+                        <Label Text="{Binding ChangeAmount, StringFormat='{0:N2}'}" Grid.Column="4" FontSize="15" TextColor="Black" VerticalOptions="Center" />
+                        
+                        <BoxView Grid.Row="1" Grid.ColumnSpan="5" HeightRequest="1" BackgroundColor="#F5F5F5" Margin="0,5,0,0"/>
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
