@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using SQLite;
 
 namespace pos.Models
@@ -9,6 +9,8 @@ namespace pos.Models
         public string Name { get; set; }
 
         public decimal Price { get; set; }
+
+        public string SubItems { get; set; } = string.Empty;
 
         [ObservableProperty,NotifyPropertyChangedFor(nameof(Total))]
         public int _quantity = 1;

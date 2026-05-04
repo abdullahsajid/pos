@@ -21,7 +21,7 @@ namespace pos.ViewModels
         public ObservableCollection<MenuItem> _products = new();
 
         [ObservableProperty]
-        public ObservableCollection<MenuItem> _productItems = new();
+        public ObservableCollection<object> _productItems = new();
 
         [ObservableProperty]
         public ObservableCollection<Deal> _deals= new();
@@ -37,6 +37,9 @@ namespace pos.ViewModels
         [ObservableProperty]
         private MenuItem[] _menuItems = [];
         public ObservableCollection<CartModel> CartItems { get; set; } = new();
+
+        [ObservableProperty]
+        private string _selectedOrderType = "Dine-In";
 
         [ObservableProperty]
         private decimal _total;
@@ -114,7 +117,13 @@ namespace pos.ViewModels
             try
             {
                 var searchResults = await _dbServices.SeachProuctsAsync(SearchText);
-                ProductItems = new ObservableCollection<MenuItem>(searchResults);
+                var dealResults = await _dbServices.SearchDealItemsAsync(SearchText);
+                
+                var unifiedResults = new List<object>();
+                if (searchResults != null) unifiedResults.AddRange(searchResults);
+                if (dealResults != null) unifiedResults.AddRange(dealResults);
+
+                ProductItems = new ObservableCollection<object>(unifiedResults);
             }
             catch (Exception ex)
             {
@@ -128,6 +137,12 @@ namespace pos.ViewModels
             {
                 var searchResults = await _dbServices.SeachProuctsAsync(ProductSearch);
                 Products = new ObservableCollection<MenuItem>(searchResults);
+                
+                var dealResults = await _dbServices.SearchDealItemsAsync(ProductSearch);
+                Deals = new ObservableCollection<Deal>(dealResults);
+
+                HasProducts = Products.Count > 0;
+                HasDeals = Deals.Count > 0;
             }
             catch (Exception ex)
             {
@@ -146,6 +161,19 @@ namespace pos.ViewModels
         [ObservableProperty]
         private string payment;
 
+        [ObservableProperty]
+        private string _discountText = "0";
+
+        partial void OnDiscountTextChanged(string value)
+        {
+            UpdateTotal();
+        }
+
+        public decimal DiscountAmount
+        {
+            get => decimal.TryParse(DiscountText, out decimal d) ? d : 0;
+        }
+
         public string Change
         {
             get
@@ -153,7 +181,7 @@ namespace pos.ViewModels
                 if (decimal.TryParse(Payment, out decimal paymentAmount))
                 {
                     decimal changeAmount = paymentAmount - Total;
-                    return changeAmount >= 0 ? changeAmount.ToString() : "0";
+                    return changeAmount >= 0 ? changeAmount.ToString("F2") : "0";
                 }
                 return "0";
             }
@@ -182,7 +210,14 @@ namespace pos.ViewModels
                 if (categoryList != null)
                 {
                     Categories.Clear();
-                  
+
+                    // Add "All Deals" category at the beginning
+                    Categories.Add(new CategoryModel
+                    {
+                        Id = -1,
+                        Name = "All Deals"
+                    });
+
                     foreach (var category in categoryList)
                     {
                         Categories.Add(new CategoryModel
@@ -207,59 +242,32 @@ namespace pos.ViewModels
             {
                 Products.Clear();
                 Deals.Clear();
-                if (SelectedCategory == null)
-                {
-                    HasProducts = false;
-                    HasDeals = false;
-                    return;
-                }
-                Debug.WriteLine($"Selected Category: {SelectedCategory.Name}, ID: {SelectedCategory.Id}");
-                var productList = await _dbServices.GetProductsByCategory(SelectedCategory.Id);
-                Debug.WriteLine($"Products fetched: {productList?.Count ?? 0}");
-                //if (SelectedCategory.Name == "Deals")
-                //{
-                //    var dealList = await _dbServices.GetDealByCategory(SelectedCategory.Id);
-                //    Debug.WriteLine($"Deals fetched: {dealList?.Count ?? 0} {dealList?.Count}");
-                //    //foreach (var deal in dealList)
-                //    //{
-                //    //    Deals.Add(deal); 
-                //    //}
-                //    if (dealList != null && dealList.Any())
-                //    {
-                //        Debug.WriteLine("Populating Deals...");
-                //        foreach (var deal in dealList)
-                //        {
-                //            if (deal == null)
-                //            {
-                //                Debug.WriteLine("Found null deal in dealList, skipping...");
-                //                continue;
-                //            }
+                HasProducts = false;
+                HasDeals = false;
 
-                //            try
-                //            {
-                //                Deals.Add(new Deal
-                //                {
-                //                    DealName = deal.DealName ?? "Unnamed Deal",
-                //                    OrderDate = deal.OrderDate, 
-                //                    DealAmount = deal.DealAmount
-                //                });
-                //                Debug.WriteLine($"Added deal: {deal.DealName}, {deal.DealAmount}");
-                //            }
-                //            catch (Exception ex)
-                //            {
-                //                Debug.WriteLine($"Error adding deal: {ex.Message}");
-                //            }
-                //        }
-                //    }
-                //    else
-                //    {
-                //        Debug.WriteLine("dealList is null or empty");
-                //    }
-                //    //return;
-                //}
-                //else
-                //{
-                    if(productList != null)
+                if (SelectedCategory == null) return;
+
+                if (SelectedCategory.Id == -1) // All Deals
+                {
+                    var dealList = await _dbServices.GetDeal();
+                    if (dealList != null)
+                    {
+                        foreach (var deal in dealList)
+                        {
+                            var items = await _dbServices.GetDealItem(deal.Id);
+                            if (items != null)
+                            {
+                                deal.DealItems = items;
+                            }
+                            Deals.Add(deal);
+                        }
+                    }
+                    HasDeals = Deals.Count > 0;
+                }
+                else // Normal product category
+                {
+                    var productList = await _dbServices.GetProductsByCategory(SelectedCategory.Id);
+                    if (productList != null)
                     {
                         foreach (var product in productList)
                         {
@@ -272,12 +280,12 @@ namespace pos.ViewModels
                             });
                         }
                     }
-                //}
-                HasProducts = Products.Count > 0;
+                    HasProducts = Products.Count > 0;
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                Debug.WriteLine($"Error in GetProducts: {ex.Message}");
                 HasProducts = false;
                 HasDeals = false;
             }
@@ -304,7 +312,7 @@ namespace pos.ViewModels
         }
 
         [RelayCommand]
-        private void AddToCart(MenuItem item)
+        private async void AddToCart(object item)
         {
             try
             {
@@ -321,6 +329,49 @@ namespace pos.ViewModels
                             Name = product.Name,
                             Price = product.Price,
                             Quantity = 1
+                        };
+                        CartItems.Add(cartitem);
+                    }
+                    else
+                    {
+                        cartitem.Quantity++;
+                    }
+                }
+                else if (item is Deal deal)
+                {
+                    // For deals, we use a unique way to identify them in cart if needed, 
+                    // or just add them as separate items. 
+                    // Since Deal Id might overlap with Product Id, we might need a way to distinguish.
+                    // However, for simplicity now, let's just add it.
+                    // To avoid Id conflict in CartItems.FirstOrDefault, we could use a negative Id or a prefix.
+                    
+                    int dealItemId = (int)(deal.Id + 100000); // Offset deal IDs to avoid conflict with products
+
+                    cartitem = CartItems.FirstOrDefault(c => c.itemId == dealItemId);
+                    if (cartitem == null)
+                    {
+                        string subItemsText = "";
+                        if (deal.DealItems == null || deal.DealItems.Count == 0)
+                        {
+                            var items = await _dbServices.GetDealItem(deal.Id);
+                            if (items != null)
+                            {
+                                deal.DealItems = items;
+                            }
+                        }
+
+                        if (deal.DealItems != null && deal.DealItems.Count > 0)
+                        {
+                            subItemsText = string.Join(", ", deal.DealItems.Select(di => $"{di.Quantity}x {di.DealName}"));
+                        }
+
+                        cartitem = new CartModel
+                        {
+                            itemId = dealItemId,
+                            Name = deal.DealName,
+                            Price = deal.DealAmount,
+                            Quantity = 1,
+                            SubItems = subItemsText
                         };
                         CartItems.Add(cartitem);
                     }
@@ -349,7 +400,10 @@ namespace pos.ViewModels
 
         public void UpdateTotal()
         {
-            Total = CartItems.Sum(c => c.Total);
+            var subTotal = CartItems.Sum(c => c.Total);
+            Total = subTotal - DiscountAmount;
+            if (Total < 0) Total = 0;
+            OnPropertyChanged(nameof(Change));
         }
 
         [RelayCommand]
@@ -366,6 +420,12 @@ namespace pos.ViewModels
         }
 
         [RelayCommand]
+        private void SelectOrderType(string type)
+        {
+            SelectedOrderType = type;
+        }
+
+        [RelayCommand]
         public async void PrintInvoice()
         {
             Debug.WriteLine("Printing Invoice");
@@ -377,13 +437,17 @@ namespace pos.ViewModels
             _cachedSettings = await _dbServices.getSettings();
             _lastOrderNumber = await _dbServices.GetNextOrderNumber();
 
+            var subTotal = CartItems.Sum(c => c.Total);
             var order = new Order
             {
                 OrderNumber = $"ORD-{_lastOrderNumber}",
                 OrderDate = DateTime.Now,
+                SubTotal = subTotal,
+                Discount = DiscountAmount,
                 TotalAmount = Total,
                 PaymentAmount = decimal.TryParse(Payment, out decimal paymentAmount) ? paymentAmount : 0,
-                ChangeAmount = decimal.TryParse(Change, out decimal changeAmount) ? changeAmount : 0
+                ChangeAmount = decimal.TryParse(Change, out decimal changeAmount) ? changeAmount : 0,
+                OrderType = SelectedOrderType
             };
 
             await _dbServices.AddOrder(order);
@@ -415,7 +479,7 @@ namespace pos.ViewModels
         private int _currentPage = 0;
         private int _totalPages = 2;
 
-        public async void PrintPageHandler(object sender, System.Drawing.Printing.PrintPageEventArgs e)
+        public void PrintPageHandler(object sender, System.Drawing.Printing.PrintPageEventArgs e)
         {
             Graphics g = e.Graphics;
             int yPos = 20;
@@ -493,7 +557,7 @@ namespace pos.ViewModels
             }
 
             // --- Order Info --- (Both Copies)
-            g.DrawString($"Invoice: ORD-{_lastOrderNumber}", bodyFont, Brushes.Black, new System.Drawing.PointF(5, yPos));
+            g.DrawString($"Invoice: ORD-{_lastOrderNumber} ({SelectedOrderType})", bodyFont, Brushes.Black, new System.Drawing.PointF(5, yPos));
             yPos += (int)lineSpacing;
 
             g.DrawString($"Date: {DateTime.Now:dd-MM-yy hh:mm tt}", bodyFont, Brushes.Black, new System.Drawing.PointF(5, yPos));
@@ -526,15 +590,40 @@ namespace pos.ViewModels
                 g.DrawString(item.Quantity.ToString(), bodyFont, Brushes.Black, new RectangleF(155, yPos, 40, lineSpacing), rightFormat);
                 g.DrawString($"{item.Price * item.Quantity:N2}", bodyFont, Brushes.Black, new RectangleF(200, yPos, 75, lineSpacing), rightFormat);
                 yPos += (int)lineSpacing;
+
+                if (!string.IsNullOrEmpty(item.SubItems))
+                {
+                    // Print sub-items in a smaller font, indented
+                    var subFont = new System.Drawing.Font("Arial", 8, FontStyle.Italic);
+                    string[] subLines = item.SubItems.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var line in subLines)
+                    {
+                        g.DrawString($"  - {line}", subFont, Brushes.Black, new RectangleF(5, yPos, 200, lineSpacing - 4), leftFormat);
+                        yPos += (int)(lineSpacing - 4);
+                    }
+                    yPos += 2; // small padding after sub-items
+                }
             }
 
             g.DrawString(new string('-', 45), bodyFont, Brushes.Black, new System.Drawing.PointF(0, yPos));
             yPos += (int)lineSpacing - 5;
 
-            // --- Totals --- (Both Copies for Subtotal)
+            // --- Totals --- (Both Copies)
+            var receiptSubTotal = CartItems.Sum(c => c.Total);
             g.DrawString("SUBTOTAL:", boldFont, Brushes.Black, new RectangleF(100, yPos, 100, lineSpacing), rightFormat);
-            g.DrawString($"{Total:N2}", boldFont, Brushes.Black, new RectangleF(200, yPos, 75, lineSpacing), rightFormat);
+            g.DrawString($"{receiptSubTotal:N2}", boldFont, Brushes.Black, new RectangleF(200, yPos, 75, lineSpacing), rightFormat);
             yPos += (int)lineSpacing;
+
+            if (DiscountAmount > 0)
+            {
+                g.DrawString("DISCOUNT:", bodyFont, Brushes.Black, new RectangleF(100, yPos, 100, lineSpacing), rightFormat);
+                g.DrawString($"- {DiscountAmount:N2}", bodyFont, Brushes.DarkRed, new RectangleF(200, yPos, 75, lineSpacing), rightFormat);
+                yPos += (int)lineSpacing;
+
+                g.DrawString("TOTAL:", boldFont, Brushes.Black, new RectangleF(100, yPos, 100, lineSpacing), rightFormat);
+                g.DrawString($"{Total:N2}", boldFont, Brushes.Black, new RectangleF(200, yPos, 75, lineSpacing), rightFormat);
+                yPos += (int)lineSpacing;
+            }
 
             // --- Payment & Footer --- (Customer Copy Only)
             if (_currentPage == 1)

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.Controls;
 using pos.Data;
@@ -15,16 +15,16 @@ namespace pos.ViewModels
         private readonly DB_Services _dbServices;
 
         [ObservableProperty]
-        public ObservableCollection<CategoryModel> _addProductCategory = new();
-
-        [ObservableProperty]
-        private CategoryModel _productCategory = null;
-
-        [ObservableProperty]
         public string _dealName;
 
         [ObservableProperty]
         public string _dealPrice;
+
+        [ObservableProperty]
+        public string _dealBarcode;
+
+        [ObservableProperty]
+        private ImageSource _selectedImageSource;
 
         [ObservableProperty]
         private DealItem _currentDeal;
@@ -36,6 +36,8 @@ namespace pos.ViewModels
         private ObservableCollection<Deal> _deals = new();
 
         public ObservableCollection<DealItem> DealItems { get; set; } = new();
+
+        private string _selectedImagePath;
 
         public AddDealModel(DB_Services dbServices)
         {
@@ -71,41 +73,57 @@ namespace pos.ViewModels
 
         public async Task InitializeAsync()
         {
-
             await _dbServices.initDatabase();
-            CurrentDeal= new DealItem();
-            await GetCategory();
+            CurrentDeal = new DealItem();
             await GetDeals();
         }
 
-        public async Task GetCategory()
+        [RelayCommand]
+        public async Task PickImage()
         {
             try
             {
-                var categoryList = await _dbServices.GetCategory();
-                if (categoryList == null || categoryList.Count == 0)
+                var result = await FilePicker.PickAsync(new PickOptions
                 {
-                    return;
-                }
-                if (categoryList != null)
-                {
-                    AddProductCategory.Clear();
-                    foreach (var category in categoryList)
-                    {
-                        AddProductCategory.Add(new CategoryModel
-                        {
-                            Id = category.Id,
-                            Name = category.Name
-                        });
-                    }
+                    PickerTitle = "Select Deal Image",
+                    FileTypes = FilePickerFileType.Images
+                });
 
-                    AddProductCategory[0].IsSelected = true;
-                    ProductCategory = AddProductCategory[0];
+                if (result != null)
+                {
+                    _selectedImagePath = result.FullPath;
+                    SelectedImageSource = ImageSource.FromFile(_selectedImagePath);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                Debug.WriteLine($"Error picking image: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        public async Task PickImageForUpdate(Deal deal)
+        {
+            try
+            {
+                var result = await FilePicker.PickAsync(new PickOptions
+                {
+                    PickerTitle = "Select Deal Image",
+                    FileTypes = FilePickerFileType.Images
+                });
+
+                if (result != null)
+                {
+                    deal.ImagePath = result.FullPath;
+                    // Force UI update if needed, though usually Entry bindings work. 
+                    // For Image we might need a property change notification.
+                    await _dbServices.UpdateDealById(deal);
+                    await GetDeals();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error picking image for update: {ex.Message}");
             }
         }
 
@@ -114,9 +132,9 @@ namespace pos.ViewModels
         {
             try
             {
-                if(string.IsNullOrEmpty(CurrentDeal.DealName) || string.IsNullOrEmpty(CurrentDeal.UnitPrice.ToString()) || CurrentDeal.Quantity <= 0)
+                if (string.IsNullOrEmpty(CurrentDeal.DealName) || CurrentDeal.UnitPrice <= 0 || CurrentDeal.Quantity <= 0)
                 {
-                    await Shell.Current.DisplayAlert("Error", "Please fill all fields", "OK");
+                    await Shell.Current.DisplayAlert("Error", "Please fill all item fields", "OK");
                     return;
                 }
                 var existingItem = DealItems.FirstOrDefault(x => x.DealName == CurrentDeal.DealName);
@@ -135,7 +153,7 @@ namespace pos.ViewModels
                 }
                 else
                 {
-                    if(existingItem.TempId == CurrentDeal.TempId)
+                    if (existingItem.TempId == CurrentDeal.TempId)
                     {
                         existingItem.Quantity += CurrentDeal.Quantity;
                     }
@@ -151,23 +169,9 @@ namespace pos.ViewModels
             }
         }
 
-        public void UpdateTotal() 
+        public void UpdateTotal()
         {
             Total = DealItems.Sum(x => x.SubTotal);
-        }
-
-        [RelayCommand]
-        private async void ProductsCategory(CategoryModel category)
-        {
-            if (ProductCategory.Id == category.Id)
-            {
-                return;
-            }
-            var currentCategory = AddProductCategory.FirstOrDefault(c => c.IsSelected);
-            currentCategory.IsSelected = false;
-            var newCategory = AddProductCategory.FirstOrDefault(c => c.Id == category.Id);
-            newCategory.IsSelected = true;
-            ProductCategory = newCategory;
         }
 
         [RelayCommand]
@@ -175,18 +179,32 @@ namespace pos.ViewModels
         {
             try
             {
-                var ProductCategory = AddProductCategory.FirstOrDefault(c => c.IsSelected);
-                if (string.IsNullOrEmpty(DealName) || Total <= 0 || DealItems == null || DealItems.Count == 0)
+                if (string.IsNullOrEmpty(DealName) || DealItems == null || DealItems.Count == 0)
                 {
-                    await Shell.Current.DisplayAlert("Error", "Please fill all fields", "OK");
+                    await Shell.Current.DisplayAlert("Error", "Please fill all required fields", "OK");
                     return;
                 }
+
+                decimal finalDealAmount = Total;
+                if (!string.IsNullOrWhiteSpace(DealPrice) && decimal.TryParse(DealPrice, out decimal parsedPrice) && parsedPrice > 0)
+                {
+                    finalDealAmount = parsedPrice;
+                }
+
+                if (finalDealAmount <= 0)
+                {
+                    await Shell.Current.DisplayAlert("Error", "Deal price must be greater than 0", "OK");
+                    return;
+                }
+
                 var deal = new Deal
                 {
                     DealName = DealName,
                     OrderDate = DateTime.Now,
-                    DealAmount = Total,
-                    CategoryId = ProductCategory.Id
+                    DealAmount = finalDealAmount,
+                    CategoryId = -1, // Default to "All Deals"
+                    ImagePath = _selectedImagePath,
+                    Barcode = DealBarcode
                 };
                 await _dbServices.AddDeal(deal);
 
@@ -204,11 +222,14 @@ namespace pos.ViewModels
                     await _dbServices.AddDealItem(dealItem);
                 }
                 DealName = string.Empty;
+                DealPrice = string.Empty;
                 Total = 0;
+                _selectedImagePath = null;
+                SelectedImageSource = null;
                 DealItems.Clear();
                 await GetDeals();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
             }

@@ -48,11 +48,7 @@
             Route="OrderPage" />
     </FlyoutItem>
 
-    <FlyoutItem Title="Deal Cart" Icon="add_to_cart">
-        <ShellContent
-            ContentTemplate="{DataTemplate pages:DealCartPage}"
-            Route="DealCartPage" />
-    </FlyoutItem>
+
 
     <FlyoutItem Title="Deals" Icon="grid">
         <ShellContent

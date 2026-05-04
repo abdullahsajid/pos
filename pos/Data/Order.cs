@@ -1,4 +1,4 @@
-﻿using SQLite;
+using SQLite;
 
 namespace pos.Data
 {
@@ -15,6 +15,10 @@ namespace pos.Data
         public decimal PaymentAmount { get; set; }
 
         public decimal ChangeAmount { get; set; }
+        
+        public string OrderType { get; set; }
+        public decimal SubTotal { get; set; }
+        public decimal Discount { get; set; }
 
         [Ignore]
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

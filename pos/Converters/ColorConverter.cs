@@ -19,6 +19,26 @@ namespace pos.Converters
         }
     }
 
+    public class StringToColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null && parameter != null)
+            {
+                if (value.ToString() == parameter.ToString())
+                {
+                    return Colors.White;
+                }
+            }
+            return Color.FromArgb("#753F21");
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class VisibilityToWidthConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

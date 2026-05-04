@@ -1,4 +1,4 @@
-﻿using SQLite;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +18,10 @@ namespace pos.Data
         public decimal DealAmount { get; set; }
 
         public int CategoryId { get; set; }
+        
+        public string ImagePath { get; set; }
+        
+        public string Barcode { get; set; }
 
         [Ignore]
         public List<DealItem> DealItems { get; set; } = new List<DealItem>();

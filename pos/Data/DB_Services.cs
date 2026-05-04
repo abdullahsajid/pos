@@ -114,7 +114,7 @@ public class DB_Services : IAsyncDisposable
 
     public async Task<List<ProductItem>> SeachProuctsAsync(string searchValue)
     {
-        if(searchValue != null)
+        if (!string.IsNullOrEmpty(searchValue))
         {
             var search = searchValue.ToLower();
             return await _database.Table<ProductItem>()
@@ -129,9 +129,12 @@ public class DB_Services : IAsyncDisposable
 
     public async Task<List<Deal>> SearchDealItemsAsync(string searchValue)
     {
-        if (searchValue != null)
+        if (!string.IsNullOrEmpty(searchValue))
         {
-            return await _database.Table<Deal>().Where(p => p.DealName.ToLower().Contains(searchValue.ToLower())).ToListAsync();
+            var search = searchValue.ToLower();
+            return await _database.Table<Deal>()
+                .Where(p => p.DealName.ToLower().Contains(search) || (p.Barcode != null && p.Barcode.ToLower().Contains(search)))
+                .ToListAsync();
         }
         else
         {
@@ -145,11 +148,11 @@ public class DB_Services : IAsyncDisposable
         {
             var productItems = await _database
                                     .Table<ProductItem>()
-                                    .Where(p => p.Name.Contains(searchValue))
+                                    .Where(p => p.Name.Contains(searchValue) || p.Barcode.Contains(searchValue))
                                     .ToListAsync();
             var dealItems = await _database
                                     .Table<Deal>()
-                                    .Where(d => d.DealName.Contains(searchValue))
+                                    .Where(d => d.DealName.Contains(searchValue) || d.Barcode.Contains(searchValue))
                                     .ToListAsync();
             var result = new List<SearchResult>();
             result.AddRange(productItems.Select(p => new SearchResult
