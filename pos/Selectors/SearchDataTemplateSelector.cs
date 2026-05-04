@@ -14,6 +14,10 @@ namespace pos.Selectors
 
         protected override DataTemplate OnSelectTemplate(object item, BindableObject container)
         {
+            if (item is Models.SearchItemModel wrapper)
+            {
+                return wrapper.Item is Deal ? DealTemplate : ProductTemplate;
+            }
             return item is Deal ? DealTemplate : ProductTemplate;
         }
     }

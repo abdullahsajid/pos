@@ -21,7 +21,7 @@ namespace pos.ViewModels
         public ObservableCollection<MenuItem> _products = new();
 
         [ObservableProperty]
-        public ObservableCollection<object> _productItems = new();
+        public ObservableCollection<SearchItemModel> _productItems = new();
 
         [ObservableProperty]
         public ObservableCollection<Deal> _deals= new();
@@ -48,6 +48,20 @@ namespace pos.ViewModels
         private bool hasProducts;
         [ObservableProperty]
         private bool hasDeals;
+
+        [ObservableProperty]
+        private SearchItemModel _selectedSearchResult;
+
+        partial void OnSelectedSearchResultChanged(SearchItemModel value)
+        {
+            if (ProductItems != null)
+            {
+                foreach (var item in ProductItems)
+                {
+                    item.IsSelected = (item == value);
+                }
+            }
+        }
 
         private string _productSearch;
         private string _lastOrderNumber;
@@ -116,14 +130,18 @@ namespace pos.ViewModels
         {
             try
             {
-                var searchResults = await _dbServices.SeachProuctsAsync(SearchText);
-                var dealResults = await _dbServices.SearchDealItemsAsync(SearchText);
+                var products = await _dbServices.SeachProuctsAsync(SearchText);
+                var deals = await _dbServices.SearchDealItemsAsync(SearchText);
                 
-                var unifiedResults = new List<object>();
-                if (searchResults != null) unifiedResults.AddRange(searchResults);
-                if (dealResults != null) unifiedResults.AddRange(dealResults);
+                var searchResults = new List<SearchItemModel>();
+                foreach (var product in products) searchResults.Add(new SearchItemModel(product));
+                foreach (var deal in deals) searchResults.Add(new SearchItemModel(deal));
 
-                ProductItems = new ObservableCollection<object>(unifiedResults);
+                ProductItems = new ObservableCollection<SearchItemModel>(searchResults);
+                if (ProductItems.Any())
+                {
+                    SelectedSearchResult = ProductItems.First();
+                }
             }
             catch (Exception ex)
             {
@@ -320,12 +338,12 @@ namespace pos.ViewModels
 
                 if (item is MenuItem product)
                 {
-                    cartitem = CartItems.FirstOrDefault(c => c.itemId == product.Id);
+                    cartitem = CartItems.FirstOrDefault(c => c.ItemId == product.Id);
                     if (cartitem == null)
                     {
                         cartitem = new CartModel
                         {
-                            itemId = product.Id,
+                            ItemId = product.Id,
                             Name = product.Name,
                             Price = product.Price,
                             Quantity = 1
@@ -347,7 +365,7 @@ namespace pos.ViewModels
                     
                     int dealItemId = (int)(deal.Id + 100000); // Offset deal IDs to avoid conflict with products
 
-                    cartitem = CartItems.FirstOrDefault(c => c.itemId == dealItemId);
+                    cartitem = CartItems.FirstOrDefault(c => c.ItemId == dealItemId);
                     if (cartitem == null)
                     {
                         string subItemsText = "";
@@ -367,7 +385,7 @@ namespace pos.ViewModels
 
                         cartitem = new CartModel
                         {
-                            itemId = dealItemId,
+                            ItemId = dealItemId,
                             Name = deal.DealName,
                             Price = deal.DealAmount,
                             Quantity = 1,
@@ -390,12 +408,13 @@ namespace pos.ViewModels
 
         public void SelectFirstSearchResult()
         {
-            if (ProductItems != null && ProductItems.Any())
+            if (SelectedSearchResult != null)
             {
-                AddToCart(ProductItems.First());
+                AddToCart(SelectedSearchResult.Item);
             }
             SearchText = string.Empty;
             IsSearchActive = false;
+            SelectedSearchResult = null;
         }
 
         public void UpdateTotal()
@@ -457,7 +476,7 @@ namespace pos.ViewModels
                 var orderItem = new OrderItem
                 {
                     OrderId = order.Id,
-                    ProductId = item.itemId,
+                    ProductId = item.ItemId,
                     Quantity = item.Quantity,
                     ProductName = item.Name,
                     CreatedDate = DateTime.Now,

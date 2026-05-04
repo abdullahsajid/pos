@@ -63,6 +63,7 @@ namespace pos
                     var viewModel = BindingContext as HomeViewModel;
                     if (viewModel == null) return;
 
+                    // --- Global Shortcuts ---
                     if (e.Key == Windows.System.VirtualKey.F5)
                     {
                         viewModel.PrintInvoiceCommand.Execute(null);
@@ -72,6 +73,49 @@ namespace pos
                     {
                         viewModel.FocusSearchCommand.Execute(null);
                         e.Handled = true;
+                    }
+
+                    // --- Search Navigation Shortcuts (only when search is open) ---
+                    else if (viewModel.IsSearchActive && viewModel.ProductItems != null && viewModel.ProductItems.Any())
+                    {
+                        if (e.Key == Windows.System.VirtualKey.Down || e.Key == Windows.System.VirtualKey.Tab)
+                        {
+                            // Move selection down
+                            var items = viewModel.ProductItems;
+                            int currentIndex = viewModel.SelectedSearchResult != null
+                                ? items.IndexOf(viewModel.SelectedSearchResult) : -1;
+                            int nextIndex = Math.Min(currentIndex + 1, items.Count - 1);
+                            viewModel.SelectedSearchResult = items[nextIndex];
+                            SearchResultsView.ScrollTo(viewModel.SelectedSearchResult);
+                            e.Handled = true;
+                        }
+                        else if (e.Key == Windows.System.VirtualKey.Up)
+                        {
+                            // Move selection up
+                            var items = viewModel.ProductItems;
+                            int currentIndex = viewModel.SelectedSearchResult != null
+                                ? items.IndexOf(viewModel.SelectedSearchResult) : 0;
+                            int prevIndex = Math.Max(currentIndex - 1, 0);
+                            viewModel.SelectedSearchResult = items[prevIndex];
+                            SearchResultsView.ScrollTo(viewModel.SelectedSearchResult);
+                            e.Handled = true;
+                        }
+                        else if (e.Key == Windows.System.VirtualKey.Enter)
+                        {
+                            // Add selected item to cart
+                            viewModel.SelectFirstSearchResult();
+                            CartSearchBar.Text = string.Empty;
+                            CartSearchBar.Focus(); // keep focus on search bar for quick scanning
+                            e.Handled = true;
+                        }
+                        else if (e.Key == Windows.System.VirtualKey.Escape)
+                        {
+                            // Close search
+                            viewModel.IsSearchActive = false;
+                            viewModel.SelectedSearchResult = null;
+                            CartSearchBar.Text = string.Empty;
+                            e.Handled = true;
+                        }
                     }
                 };
             }

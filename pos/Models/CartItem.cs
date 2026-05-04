@@ -5,7 +5,7 @@ namespace pos.Models
 {
     public partial class CartModel : ObservableObject
     {
-        public int itemId { get; set; }
+        public int ItemId { get; set; }
         public string Name { get; set; }
 
         public decimal Price { get; set; }

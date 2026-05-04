@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using pos.Data;
 using pos.Models;
@@ -300,12 +300,12 @@ namespace pos.ViewModels
             try
             {
                 CartModel cartitem = null;
-                cartitem = CartItems.FirstOrDefault(c => c.itemId == item.Id);
+                cartitem = CartItems.FirstOrDefault(c => c.ItemId == item.Id);
                 if (cartitem == null)
                 {
                      cartitem = new CartModel
                      {
-                         itemId = item.Id,
+                         ItemId = item.Id,
                          Name = item.Name,
                          Price = item.Price,
                          Quantity = 1
@@ -388,7 +388,7 @@ namespace pos.ViewModels
                 var orderItem = new OrderItem
                 {
                     OrderId = order.Id,
-                    ProductId = item.itemId,
+                    ProductId = item.ItemId,
                     Quantity = item.Quantity,
                     ProductName = item.Name,
                     CreatedDate = DateTime.Now,
